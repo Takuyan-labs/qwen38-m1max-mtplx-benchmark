@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this benchmark record, cite this repository and the upstream MTPLX/model artifact."
+title: "Qwen3.8-27B M1 Max MTPLX Benchmark"
+type: software
+authors:
+  - family-names: "takuyantosnoopy"
+repository-code: "https://github.com/takuyantosnoopy/qwen38-m1max-mtplx-benchmark"
+license: MIT
+date-released: 2026-08-31

@@ -1,0 +1,222 @@
+{
+  "metadata": {
+    "created_at": "2026-08-31T14:24:38.489262+00:00",
+    "api_url": "http://127.0.0.1:18038/v1/chat/completions",
+    "model_id": "qwen3.8-27b-mtplx",
+    "prompt": "Output only valid Python code implementing merge sort, binary search, and deterministic unit tests.",
+    "max_tokens": 512,
+    "sampling": {
+      "temperature": 0,
+      "top_p": 1,
+      "top_k": 1,
+      "seed": 123
+    },
+    "cache_mode": "bypass",
+    "run_order": "parity AR/D1/D2/D3, then speed ABBA-balanced AR/D3"
+  },
+  "parity": {
+    "rows": [
+      {
+        "stage": "parity",
+        "run": 1,
+        "requested_mode": "ar",
+        "requested_depth": 0,
+        "effective_mode": "ar",
+        "effective_depth": 0,
+        "prompt_tokens": 29,
+        "generated_tokens": 512,
+        "finish_reason": "length",
+        "cache_source": "none",
+        "cached_tokens": 0,
+        "server_decode_elapsed_s": 35.750902332991245,
+        "server_request_elapsed_s": 36.103283125004964,
+        "server_decode_tok_s": 14.321316850442734,
+        "server_end_to_end_tok_s": 14.181886982484789,
+        "calculated_decode_tok_s": 14.321316850442734,
+        "client_wall_s": 36.110678542,
+        "client_final_output_tok_s": 14.178631381974654,
+        "verify_calls": 0,
+        "accepted_drafts": 0,
+        "rejected_drafts": 0,
+        "drafted_tokens": 0,
+        "bonus_tokens": 0,
+        "accepted_by_depth": [],
+        "drafted_by_depth": [],
+        "mean_accept_probability_by_depth": [],
+        "compiled_verify_calls": 0,
+        "compiled_verify_fallback_calls": 0,
+        "active_memory_bytes": 20477448782,
+        "peak_memory_bytes": 23020242968,
+        "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a",
+        "output_bytes": 1669
+      },
+      {
+        "stage": "parity",
+        "run": 2,
+        "requested_mode": "mtp",
+        "requested_depth": 1,
+        "effective_mode": "mtp",
+        "effective_depth": 1,
+        "prompt_tokens": 29,
+        "generated_tokens": 512,
+        "finish_reason": "length",
+        "cache_source": "none",
+        "cached_tokens": 0,
+        "server_decode_elapsed_s": 23.345476707996568,
+        "server_request_elapsed_s": 23.709519208998245,
+        "server_decode_tok_s": 21.93144335427615,
+        "server_end_to_end_tok_s": 21.596104269474562,
+        "calculated_decode_tok_s": 21.93144335427615,
+        "client_wall_s": 23.71694525,
+        "client_final_output_tok_s": 21.587940377776942,
+        "verify_calls": 258,
+        "accepted_drafts": 254,
+        "rejected_drafts": 4,
+        "drafted_tokens": 258,
+        "bonus_tokens": 253,
+        "accepted_by_depth": [
+          254
+        ],
+        "drafted_by_depth": [
+          258
+        ],
+        "mean_accept_probability_by_depth": [
+          0.9844961240310077
+        ],
+        "compiled_verify_calls": 258,
+        "compiled_verify_fallback_calls": 0,
+        "active_memory_bytes": 20477448782,
+        "peak_memory_bytes": 23020242968,
+        "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a",
+        "output_bytes": 1669
+      },
+      {
+        "stage": "parity",
+        "run": 3,
+        "requested_mode": "mtp",
+        "requested_depth": 2,
+        "effective_mode": "mtp",
+        "effective_depth": 2,
+        "prompt_tokens": 29,
+        "generated_tokens": 512,
+        "finish_reason": "length",
+        "cache_source": "none",
+        "cached_tokens": 0,
+        "server_decode_elapsed_s": 23.54097408299276,
+        "server_request_elapsed_s": 23.905349208995176,
+        "server_decode_tok_s": 21.74931241990941,
+        "server_end_to_end_tok_s": 21.419457028869942,
+        "calculated_decode_tok_s": 21.74931241990941,
+        "client_wall_s": 23.913488167,
+        "client_final_output_tok_s": 21.410510939451605,
+        "verify_calls": 176,
+        "accepted_drafts": 336,
+        "rejected_drafts": 9,
+        "drafted_tokens": 351,
+        "bonus_tokens": 166,
+        "accepted_by_depth": [
+          170,
+          166
+        ],
+        "drafted_by_depth": [
+          176,
+          175
+        ],
+        "mean_accept_probability_by_depth": [
+          0.9659090909090909,
+          0.9485714285714286
+        ],
+        "compiled_verify_calls": 176,
+        "compiled_verify_fallback_calls": 0,
+        "active_memory_bytes": 20477448782,
+        "peak_memory_bytes": 23020242968,
+        "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a",
+        "output_bytes": 1669
+      },
+      {
+        "stage": "parity",
+        "run": 4,
+        "requested_mode": "mtp",
+        "requested_depth": 3,
+        "effective_mode": "mtp",
+        "effective_depth": 3,
+        "prompt_tokens": 29,
+        "generated_tokens": 512,
+        "finish_reason": "length",
+        "cache_source": "none",
+        "cached_tokens": 0,
+        "server_decode_elapsed_s": 14.44938766600535,
+        "server_request_elapsed_s": 14.809509291000722,
+        "server_decode_tok_s": 35.434027505855305,
+        "server_end_to_end_tok_s": 34.57672061210962,
+        "calculated_decode_tok_s": 35.434027505855305,
+        "client_wall_s": 14.817606458,
+        "client_final_output_tok_s": 34.55348888170613,
+        "verify_calls": 135,
+        "accepted_drafts": 377,
+        "rejected_drafts": 15,
+        "drafted_tokens": 403,
+        "bonus_tokens": 119,
+        "accepted_by_depth": [
+          130,
+          128,
+          119
+        ],
+        "drafted_by_depth": [
+          135,
+          134,
+          134
+        ],
+        "mean_accept_probability_by_depth": [
+          0.9629629629629629,
+          0.9552238805970149,
+          0.8880597014925373
+        ],
+        "compiled_verify_calls": 135,
+        "compiled_verify_fallback_calls": 0,
+        "active_memory_bytes": 20477448782,
+        "peak_memory_bytes": 23020242968,
+        "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a",
+        "output_bytes": 1669
+      }
+    ],
+    "outputs_identical": true
+  },
+  "speed": {
+    "ar": {
+      "runs": 5,
+      "server_decode_tok_s": [
+        14.340123129967436,
+        14.161650237626912,
+        13.891555418626819,
+        13.502511509761016,
+        13.371960307066699
+      ],
+      "mean_server_decode_tok_s": 13.853560120609776,
+      "median_server_decode_tok_s": 13.891555418626819,
+      "sample_stddev_server_decode_tok_s": 0.41481328104756654,
+      "sample_cv_percent": 2.9942720675132,
+      "min_server_decode_tok_s": 13.371960307066699,
+      "max_server_decode_tok_s": 14.340123129967436,
+      "median_client_final_output_tok_s": 13.744164377058535
+    },
+    "mtp-d3": {
+      "runs": 5,
+      "server_decode_tok_s": [
+        33.096844510998814,
+        32.52217330096416,
+        29.15959450248621,
+        28.835907508323572,
+        27.250509243048402
+      ],
+      "mean_server_decode_tok_s": 30.17300581316423,
+      "median_server_decode_tok_s": 29.15959450248621,
+      "sample_stddev_server_decode_tok_s": 2.5210732427107287,
+      "sample_cv_percent": 8.355393089841932,
+      "min_server_decode_tok_s": 27.250509243048402,
+      "max_server_decode_tok_s": 33.096844510998814,
+      "median_client_final_output_tok_s": 28.438309669086387
+    }
+  },
+  "median_speedup_d3_vs_ar": 2.099087800016036
+}

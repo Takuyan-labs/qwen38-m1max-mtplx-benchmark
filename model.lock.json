@@ -1,0 +1,8 @@
+{
+  "repository": "Youssofal/Qwen3.8-27B-MTPLX-Optimized-Speed-FP16",
+  "huggingface_revision": "c984b2932d29676a6dabb6431b27da7ca2411508",
+  "pulled_for_measurement_at": "2026-08-21T03:19:29Z",
+  "mtplx_runtime_public_model_id": "mtplx-qwen38-27b-optimized-speed-fp16",
+  "mtplx_artifact_fingerprint": "sha256:069c2de291fd15b130383119b13f60c45e0f78481a180cf51887ae87c3986b12",
+  "weights_in_this_repository": false
+}

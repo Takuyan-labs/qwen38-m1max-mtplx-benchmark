@@ -1,0 +1,22 @@
+{
+  "date": "2026-08-31",
+  "hardware": {
+    "model": "MacBook Pro",
+    "model_identifier": "MacBookPro18,2",
+    "chip": "Apple M1 Max",
+    "cpu_cores": 10,
+    "gpu_cores": 32,
+    "unified_memory_gb": 64,
+    "metal_support": "Metal 4"
+  },
+  "software": {
+    "macos_version": "26.6.2",
+    "macos_build": "25G83",
+    "python_version": "3.13.3",
+    "mtplx_version": "2.9.0",
+    "mlx_version": "0.32.1",
+    "mlx_lm_version": "0.31.3",
+    "numpy_version": "2.5.2"
+  },
+  "privacy": "Serial number, hardware UUID, provisioning UDID, authentication data, and user paths omitted"
+}

@@ -1,0 +1,10 @@
+{
+  "python": "3.13.3",
+  "mtplx": "2.9.0",
+  "mlx": "0.32.1",
+  "mlx_lm": "0.31.3",
+  "numpy": "2.5.2",
+  "macos": "26.6.2",
+  "macos_build": "25G83",
+  "architecture": "arm64"
+}

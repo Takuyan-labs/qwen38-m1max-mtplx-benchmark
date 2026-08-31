@@ -1,0 +1,56 @@
+{
+  "published_directory": "results/burst-2026-08-31",
+  "source_result_directory": "results/raw",
+  "runs": 5,
+  "decode_tok_s": [
+    36.84748643399615,
+    39.89674042838025,
+    39.871282212673805,
+    38.909461765238845,
+    35.20070736922257
+  ],
+  "mean_decode_tok_s": 38.14513564190232,
+  "median_decode_tok_s": 38.909461765238845,
+  "sample_stddev_decode_tok_s": 2.0606702219392448,
+  "min_decode_tok_s": 35.20070736922257,
+  "max_decode_tok_s": 39.89674042838025,
+  "ablation": [
+    {
+      "file": "ablation-ar-d0.json",
+      "mode": "ar",
+      "depth": 0,
+      "generated_tokens": 512,
+      "decode_tok_s": 14.371466340432647,
+      "end_to_end_tok_s": 14.234160811450034,
+      "sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a"
+    },
+    {
+      "file": "ablation-mtp-d1.json",
+      "mode": "mtp",
+      "depth": 1,
+      "generated_tokens": 512,
+      "decode_tok_s": 22.66661101836037,
+      "end_to_end_tok_s": 22.322994499672117,
+      "sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a"
+    },
+    {
+      "file": "ablation-mtp-d2.json",
+      "mode": "mtp",
+      "depth": 2,
+      "generated_tokens": 512,
+      "decode_tok_s": 22.34898720930824,
+      "end_to_end_tok_s": 22.007954708514728,
+      "sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a"
+    },
+    {
+      "file": "ablation-mtp-d3.json",
+      "mode": "mtp",
+      "depth": 3,
+      "generated_tokens": 512,
+      "decode_tok_s": 35.718796348465126,
+      "end_to_end_tok_s": 34.8529551758591,
+      "sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a"
+    }
+  ],
+  "ablation_outputs_identical": true
+}

@@ -1,0 +1,18 @@
+{
+  "date": "2026-08-31",
+  "generated_tokens": 1024,
+  "finish_reason": "length",
+  "decode_tok_s": 35.06061926919824,
+  "end_to_end_tok_s": 34.0463712407506,
+  "decode_elapsed_s": 29.20655770902522,
+  "prompt_tokens": 42,
+  "verify_calls": 277,
+  "accepted_drafts": 747,
+  "drafted_tokens": 830,
+  "bonus_tokens": 231,
+  "mean_accept_probability_by_depth": [
+    0.9638989169675091,
+    0.8989169675090253,
+    0.8369565217391305
+  ]
+}
