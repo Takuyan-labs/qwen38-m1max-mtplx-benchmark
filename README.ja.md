@@ -77,3 +77,9 @@ export MTPLX_BIN="mtplx"
 > M1 Max 64 GB上のQwen3.8-27Bで、MTPLX 2.9.0 MTP D3 speculative decodingを使用し、AR/D3交互5回のsingle-stream Decode中央値29.16 tok/sを記録。AR中央値13.89 tok/sに対して2.10倍。別の短いD3単独系列では最大39.90 tok/s。Prefix Cache無効。
 
 これは第三者認定の世界記録ではなく、条件と生データを公開したローカル実測記録です。
+
+## ライセンス
+
+独自のベンチスクリプト、文書、プロンプト、設定、および測定記録の選択・構成について管理者が保有する著作権上の利益はMIT Licenseです。個々の測定事実は著作物に当たらない場合があります。モデル生成文を私たちの著作物とは主張せず、現在の公開結果には本文を含めず、SHA-256、Byte数、Token数、時間、Runtime統計だけを保存します。
+
+Qwenモデル、最適化Artifact、MTPLX、MLX、mlx-lmなどの第三者成果物には各上流条件が適用されます。詳しくは[第三者Notice](THIRD_PARTY_NOTICES.md)と[測定データの範囲](results/README.md)を参照してください。

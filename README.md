@@ -142,6 +142,7 @@ The script deliberately excludes serial numbers, UUIDs, and provisioning identif
 - [`results/m1max-1024-d3.json`](results/m1max-1024-d3.json)
 - [`results/system.json`](results/system.json)
 - [`model.lock.json`](model.lock.json)
+- [`results/README.md`](results/README.md) — data and generated-output scope
 
 ## Interpretation
 
@@ -159,4 +160,6 @@ Comparisons with NVIDIA or newer Apple Silicon results require matching the mode
 
 ## Licenses
 
-The benchmark scripts and original documentation in this repository are released under the MIT License. Qwen model weights, MTPLX, and all third-party components remain under their respective upstream licenses.
+The original benchmark scripts, documentation, prompts, configuration, and the maintainer's copyrightable interest in the selection and arrangement of measurement records are released under the MIT License. Factual measurements may not be copyrightable. Model-generated text is not claimed as original work and is not published in the current result files; output parity is recorded with SHA-256 hashes and byte counts.
+
+Qwen model weights, the optimized artifact, MTPLX, MLX, mlx-lm, and all other third-party components remain under their respective upstream terms. See [Third-party notices](THIRD_PARTY_NOTICES.md) and [results data scope](results/README.md).

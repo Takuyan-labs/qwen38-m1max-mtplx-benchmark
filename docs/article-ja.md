@@ -176,3 +176,12 @@ export MTPLX_BIN="mtplx"
 8. 他の大規模モデルを停止したメモリ管理
 
 AR/D3交互測定では、AR中央値13.89 tok/sからMTP D3中央値29.16 tok/sへ、同じGreedy出力を維持したまま2.10倍になった。短いD3単独系列の最大値は39.90 tok/sだった。世界記録という肩書きより、瞬間値と連続反復値の違い、生JSONL、Client wall-clock、再現スクリプトを公開し、他のM1 Maxで追試可能にしたことの方が技術的には重要である。
+
+## ライセンス・クレジット
+
+- Qwen3.8-27B: [Model card](https://huggingface.co/Qwen/Qwen3.8-27B) / [Apache-2.0 License](https://huggingface.co/Qwen/Qwen3.8-27B/blob/main/LICENSE)
+- 使用Artifact: [`Youssofal/Qwen3.8-27B-MTPLX-Optimized-Speed-FP16`](https://huggingface.co/Youssofal/Qwen3.8-27B-MTPLX-Optimized-Speed-FP16)（HF metadata上Apache-2.0、計測Revisionは`model.lock.json`参照）
+- MTPLX 2.9.0: [LICENSE](https://github.com/youssofal/MTPLX/blob/v2.9.0/LICENSE) / [NOTICE](https://github.com/youssofal/MTPLX/blob/v2.9.0/NOTICE) / [CITATION.cff](https://github.com/youssofal/MTPLX/blob/v2.9.0/CITATION.cff)
+- MLX / mlx-lm: [MLX MIT License](https://github.com/ml-explore/mlx/blob/main/LICENSE) / [mlx-lm MIT License](https://github.com/ml-explore/mlx-lm/blob/main/LICENSE)
+
+> Powered by MTPLX by Youssof Altoukhi — https://github.com/youssofal/MTPLX

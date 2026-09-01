@@ -9,6 +9,9 @@ HOST="${HOST:-127.0.0.1}"
 PORT="${PORT:-18038}"
 MODEL_ID="${MODEL_ID:-qwen3.8-27b-mtplx}"
 
+print -r -- "Powered by MTPLX by Youssof Altoukhi"
+print -r -- "https://github.com/youssofal/MTPLX"
+
 exec "$MTPLX_BIN" quickstart \
   --model "$MODEL_PATH" \
   --model-id "$MODEL_ID" \

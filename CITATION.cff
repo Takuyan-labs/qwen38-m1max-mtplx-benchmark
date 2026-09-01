@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use this benchmark record, cite this repository and the upstream MTPLX/model artifact."
+message: "If you use this benchmark record, cite this repository, MTPLX v2.9.0 by Youssof Altoukhi, and the upstream Qwen/model artifact; see THIRD_PARTY_NOTICES.md."
 title: "Qwen3.8-27B M1 Max MTPLX Benchmark"
 type: software
 authors:
