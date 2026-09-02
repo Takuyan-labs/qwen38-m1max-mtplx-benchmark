@@ -1,0 +1,30 @@
+[
+  {
+    "id": "japanese-prose",
+    "label_en": "Japanese prose",
+    "label_ja": "日本語の技術文",
+    "kind": "natural-language",
+    "prompt": "ローカルAI推論において、量子化、メモリ帯域、投機的デコードが生成速度にどう影響するかを、専門用語を説明しながら日本語だけで詳しく論じてください。序論、三要素の因果関係、実用上の注意、結論を含む1800字以上の連続した文章にしてください。見出し、箇条書き、数式、コードは使わず、日本語本文だけを出力してください。"
+  },
+  {
+    "id": "english-prose",
+    "label_en": "English prose",
+    "label_ja": "英語の技術文",
+    "kind": "natural-language",
+    "prompt": "Discuss in English how quantization, memory bandwidth, and speculative decoding affect generation speed in local AI inference, explaining every technical term. Write at least 900 words of continuous prose containing an introduction, the causal relationship among the three factors, practical cautions, and a conclusion. Do not use headings, lists, equations, or code. Output only the English prose."
+  },
+  {
+    "id": "chinese-prose",
+    "label_en": "Chinese prose",
+    "label_ja": "中国語の技術文",
+    "kind": "natural-language",
+    "prompt": "请只用简体中文详细讨论在本地人工智能推理中，量化、内存带宽和推测解码如何影响生成速度，并解释所有技术术语。请写一篇不少于1800个汉字的连贯文章，包含引言、三个因素之间的因果关系、实际使用注意事项和结论。不要使用标题、项目符号、公式或代码，只输出中文正文。"
+  },
+  {
+    "id": "python-code",
+    "label_en": "Python code",
+    "label_ja": "Pythonコード",
+    "kind": "code",
+    "prompt": "Output only valid Python code implementing merge sort, binary search, and deterministic unit tests."
+  }
+]

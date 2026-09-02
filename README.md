@@ -5,6 +5,7 @@ Reproducible single-stream benchmark of Qwen3.8-27B on an Apple M1 Max (32-core 
 > **Interleaved five-run medians: AR 13.89 tok/s, MTP D3 29.16 tok/s.**
 > Interleaved repeated-run speedup: **2.10x**. A shorter D3-only series reached 39.90 tok/s.
 > Prefix cache disabled. Greedy AR/D1/D2/D3 outputs were byte-identical.
+> Separate content-mix D3 medians: Japanese 18.67, English 22.28, Chinese 19.43, Python code 33.05 tok/s.
 
 This is not a claim that the 27B target model natively decodes at 29–40 tok/s. It is final-output throughput with speculative decoding. Only committed output tokens are counted; draft tokens are not. The primary result alternates AR and D3 across a multi-minute sequence to expose performance drift. It is not a long-duration endurance test or one continuous long response.
 
@@ -44,6 +45,21 @@ All four modes produced the same 512-token byte sequence and SHA-256 digest.
 ### Longer run
 
 A separate single 1,024-token run measured 35.061 tok/s decode and 34.046 tok/s end-to-end (`n=1`). It used a different 42-token prompt, so it is supporting evidence rather than a direct output-length comparison with the 29-token formal prompt.
+
+### Content-mix throughput: Japanese, English, Chinese, and code
+
+A separate 40-request run compared four output domains under the same 512-token greedy, cache-bypassed AR/D3 conditions. Each prompt and mode was repeated five times; content order was rotated and AR/D3 order alternated between rounds.
+
+| Output domain | AR median | MTP D3 median | D3 range | D3/AR ratio of medians | D3 draft acceptance | D3 code points/s median |
+|---|---:|---:|---:|---:|---:|---:|
+| Japanese technical prose | 14.73 | **18.67** | 18.41–20.12 | 1.27x | 41.00% | 33.84 |
+| English technical prose | 14.87 | **22.28** | 20.94–23.72 | 1.50x | 54.84% | 127.24 |
+| Simplified Chinese technical prose | 14.55 | **19.43** | 18.50–19.89 | 1.34x | 40.87% | 36.17 |
+| Python code | 14.76 | **33.05** | 31.83–34.70 | 2.24x | 93.55% | 107.74 |
+
+All 40 requests produced 512 final tokens, used zero cached tokens, and had zero compiled-verification fallbacks. For each prompt, every AR and D3 repetition had the same output SHA-256. The code-only burst maximum remains 39.90 tok/s; it should not be presented as the expected speed of Japanese or other unconstrained prose.
+
+The observed speed differences tracked draft acceptance and output predictability, not a simple ranking of languages. In these prompts, Python syntax coincided with much higher draft accuracy and reduced target verification calls to 135 per 512 tokens, versus 194 for English, 229 for Japanese, and 230 for Chinese. This is a one-prompt-per-category throughput microbenchmark, not a general language or quality benchmark. A token also represents different amounts of visible text across tokenizers and languages, so code points/s is included but is not semantic information per second.
 
 ### Public comparison context
 
@@ -124,6 +140,12 @@ In another terminal:
 
 Local output is written to the git-ignored `results/raw/` directory, leaving the published evidence unchanged. Use `--output-dir` to select another destination.
 
+To repeat the Japanese/English/Chinese/code content-mix run:
+
+```bash
+python3 scripts/benchmark_content_mix.py
+```
+
 Required command-line tools: Python 3. The server-start and safe-system-info helpers also use standard macOS shell tools and `jq`.
 
 ### 4. Capture safe system metadata
@@ -139,6 +161,8 @@ The script deliberately excludes serial numbers, UUIDs, and provisioning identif
 - [`results/formal/raw-runs.jsonl`](results/formal/raw-runs.jsonl)
 - [`results/formal/summary.json`](results/formal/summary.json)
 - [`results/burst-2026-08-31/summary.json`](results/burst-2026-08-31/summary.json)
+- [`results/content-mix-2026-09-01/summary.json`](results/content-mix-2026-09-01/summary.json)
+- [`results/content-mix-2026-09-01/raw-runs.jsonl`](results/content-mix-2026-09-01/raw-runs.jsonl)
 - [`results/m1max-1024-d3.json`](results/m1max-1024-d3.json)
 - [`results/system.json`](results/system.json)
 - [`model.lock.json`](model.lock.json)

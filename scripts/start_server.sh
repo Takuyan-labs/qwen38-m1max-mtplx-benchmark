@@ -5,8 +5,8 @@ set -euo pipefail
 : "${MODEL_PATH:?Set MODEL_PATH to the downloaded Optimized-Speed-FP16 model directory}"
 
 MTPLX_BIN="${MTPLX_BIN:-mtplx}"
-HOST="${HOST:-127.0.0.1}"
-PORT="${PORT:-18038}"
+MTPLX_HOST="${MTPLX_HOST:-127.0.0.1}"
+MTPLX_PORT="${MTPLX_PORT:-18038}"
 MODEL_ID="${MODEL_ID:-qwen3.8-27b-mtplx}"
 
 print -r -- "Powered by MTPLX by Youssof Altoukhi"
@@ -16,8 +16,8 @@ exec "$MTPLX_BIN" quickstart \
   --model "$MODEL_PATH" \
   --model-id "$MODEL_ID" \
   --profile turbo \
-  --host "$HOST" \
-  --port "$PORT" \
+  --host "$MTPLX_HOST" \
+  --port "$MTPLX_PORT" \
   --mtp \
   --depth 3 \
   --reasoning off \

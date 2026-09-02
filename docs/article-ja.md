@@ -95,6 +95,25 @@ and deterministic unit tests.
 
 別の42-token promptを使った1,024トークン生成1回では、Decode 35.061 tok/s、End-to-end 34.046 tok/s、Decode時間29.207秒だった。Formal runの入力は29 tokensなので、出力長だけの直接比較ではない。長い出力での補助測定であり、`n=1`なので反復統計としても扱わない。
 
+### 日本語・英語・中国語・コードの40回比較
+
+コードの最大39.90 tok/sを自由な文章へ一般化しないため、同じモデル・Runtime・Macで出力内容別の追加測定を行った。日本語、英語、簡体字中国語は同じ技術テーマの説明文を各言語で求め、コードはFormal runと同じPython課題を使った。
+
+各プロンプトについてARとMTP D3を5回ずつ、合計40リクエスト測定した。条件は512 final output tokens、Greedy、Seed固定、Thinking無効、Cache bypass。カテゴリ順を各周で回転させ、奇数周はAR→D3、偶数周はD3→ARとして順序効果を一方向へ偏らせなかった。
+
+| 出力 | AR中央値 | MTP D3中央値 | D3最小〜最大 | D3/AR中央値比 | D3 Draft受理率 | D3 Unicode code points/秒中央値 |
+|---|---:|---:|---:|---:|---:|---:|
+| 日本語の技術文 | 14.73 tok/s | **18.67 tok/s** | 18.41〜20.12 | 1.27倍 | 41.00% | 33.84 |
+| 英語の技術文 | 14.87 tok/s | **22.28 tok/s** | 20.94〜23.72 | 1.50倍 | 54.84% | 127.24 |
+| 簡体字中国語の技術文 | 14.55 tok/s | **19.43 tok/s** | 18.50〜19.89 | 1.34倍 | 40.87% | 36.17 |
+| Pythonコード | 14.76 tok/s | **33.05 tok/s** | 31.83〜34.70 | 2.24倍 | 93.55% | 107.74 |
+
+40件すべてが512 tokensを生成して`finish_reason=length`で終了し、Cached tokensは0、Compiled verification fallbackも0だった。各プロンプトでは、AR/D3を含む10出力すべてのSHA-256が一致した。したがって、D3が文章を短縮したため速く見えた結果ではない。
+
+この比較でもARは全カテゴリ14.55〜14.87 tok/sの近い中央値だったのに対し、D3だけが18.67〜33.05 tok/sへ分かれた。観測されたD3速度差はDraft受理率と整合する。512 tokensを確定するTarget verification回数は、コード135回、英語194回、日本語229回、中国語230回である。コードではDraftの93.55%が受理され、自由文では40.87〜54.84%だったため、コードほど1回のVerificationで多くのtokenを確定できた。
+
+ただし、これは各カテゴリ1プロンプトを5回反復した出力ドメイン速度テストであり、「英語は常に日本語より速い」と証明する一般的な言語ベンチではない。テーマ、文体、Tokenizer、モデルが変われば受理率も変わる。また英語1 tokenと日本語1 tokenでは表示される文字数が異なる。そこでUnicode code points/秒も併記したが、これも意味情報量/秒を直接表すものではない。
+
 ## 公開情報との比較
 
 2026-08-31時点で、[今回と同じFP16 Artifactのモデルカード](https://huggingface.co/Youssofal/Qwen3.8-27B-MTPLX-Optimized-Speed-FP16)は「M1/M2の数値はまだ公開していない」と明記している。同ページには、BF16親モデルをM5 Maxで測ったコード課題58.7 tok/s、長いxhigh reasoning 35.1〜37.3 tok/sが掲載されている。
@@ -138,6 +157,8 @@ Samplingを使う場合も、MTPLXはProbability ratioとResidual resamplingに�
 
 自由文章ではMTP受理率が変わり得て、長い履歴ではPrefill時間も支配的になる。本結果は、短い入力からの予測しやすいコード生成におけるsingle-stream Decode記録として読むべきである。
 
+追加の40回比較では、自由文のMTP D3中央値は日本語18.67、英語22.28、中国語19.43 tok/sだった。したがって「コードでは最大約40 tok/s、今回の自由文では連続測定中央値約19〜22 tok/s」という二段階の説明が、このMacでの現実的な表現になる。
+
 また、RTX 5090やM5 MaxのMTP記録も同じ「最終確定トークンのSpeculative Decode」というカテゴリーに置けるが、モデルArtifact、量子化、Prompt、Context、Output length、Sampling、Cache、Throughput定義を揃えない限り直接比較はできない。
 
 ## 再現方法
@@ -158,7 +179,17 @@ export MTPLX_BIN="mtplx"
 ./scripts/benchmark.sh
 ```
 
-スクリプトは各モードをWarmupし、まずAR/D1/D2/D3のGreedy出力一致を検証する。続いてARとD3をABBA順で交互に各5回測定し、サーバー側Decode時間とClient wall-clockの両方を保存する。公開JSONLには生成本文を含めず、出力のSHA-256、Byte数、Cache状態、MTP統計だけを記録する。
+出力内容別の40回比較は、次のコマンドで再実行できる。
+
+```bash
+python3 scripts/benchmark_content_mix.py
+```
+
+`benchmark.sh`は各モードをWarmupし、まずAR/D1/D2/D3のGreedy出力一致を検証する。続いてARとD3をABBA順で交互に各5回測定する。
+
+`benchmark_content_mix.py`はARとD3をWarmupし、日本語・英語・中国語・コードの順を各周で回転・反転する。奇数周はAR→D3、偶数周はD3→ARとして、各カテゴリ・各モードを5回測定する。自然文プロンプトは早期EOSを避けるため意図的に512 tokensを超える長さを要求し、全リクエストを512 final tokensで打ち切る固定長Throughput試験である。
+
+どちらもサーバー側Decode時間とClient wall-clockの両方を保存する。公開JSONLには生成本文を含めず、出力のSHA-256、Byte数、Unicode code point数、Cache状態、MTP統計だけを記録する。
 
 通常の実行結果はGit管理外の`results/raw/`へ保存されるため、同梱したFormal resultは上書きされない。
 
@@ -175,7 +206,7 @@ export MTPLX_BIN="mtplx"
 7. Single-stream、Solo、Cache bypass
 8. 他の大規模モデルを停止したメモリ管理
 
-AR/D3交互測定では、AR中央値13.89 tok/sからMTP D3中央値29.16 tok/sへ、同じGreedy出力を維持したまま2.10倍になった。短いD3単独系列の最大値は39.90 tok/sだった。世界記録という肩書きより、瞬間値と連続反復値の違い、生JSONL、Client wall-clock、再現スクリプトを公開し、他のM1 Maxで追試可能にしたことの方が技術的には重要である。
+AR/D3交互測定では、AR中央値13.89 tok/sからMTP D3中央値29.16 tok/sへ、同じGreedy出力を維持したまま2.10倍になった。短いコードD3単独系列の最大値は39.90 tok/sだった。一方、追加の40回比較ではD3中央値が日本語18.67、英語22.28、中国語19.43、コード33.05 tok/sとなり、速度がDraft受理率と出力内容に強く依存することも確認できた。世界記録という肩書きより、瞬間値と連続反復値の違い、生JSONL、Client wall-clock、再現スクリプトを公開し、他のM1 Maxで追試可能にしたことの方が技術的には重要である。
 
 ## ライセンス・クレジット
 
