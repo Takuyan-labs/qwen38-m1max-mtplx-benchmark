@@ -1,0 +1,12 @@
+{
+  "modelPicker": {
+    "options": [
+      {
+        "model": "qwen3.8-27b-mtplx",
+        "label": "Qwen3.8-27B (MTPLX D3)",
+        "description": "Local Qwen model through MTPLX Turbo MTP D3",
+        "behavesAs": "claude-sonnet-4-6"
+      }
+    ]
+  }
+}

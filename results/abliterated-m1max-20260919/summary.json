@@ -1,0 +1,46 @@
+{
+  "record_date": "2026-09-19",
+  "variant": "Qwen3.8-27B-Abliterated-MTPLX-Optimized-Speed-M1-FP16",
+  "artifact_repository": "PocketAiHub/Qwen3.8-27B-Abliterated-MTPLX-Optimized-Speed",
+  "base_model": "Qwen/Qwen3.8-27B",
+  "base_revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+  "hardware": {
+    "chip": "Apple M1 Max",
+    "gpu_cores": 32,
+    "unified_memory_gb": 64
+  },
+  "runtime": {
+    "mtplx": "2.9.0",
+    "profile": "turbo",
+    "generation_mode": "mtp",
+    "depth": 3,
+    "single_stream": true,
+    "cache_mode": "bypass"
+  },
+  "content_mix": [
+    {"id": "japanese", "decode_tok_s": 20.897604744958056, "end_to_end_tok_s": 19.8118924553197, "generated_tokens": 461, "finish_reason": "stop"},
+    {"id": "code", "decode_tok_s": 32.55119403148866, "end_to_end_tok_s": 31.461323640868486, "generated_tokens": 512, "finish_reason": "length"},
+    {"id": "math", "decode_tok_s": 33.86811653589505, "end_to_end_tok_s": 32.67820621427636, "generated_tokens": 512, "finish_reason": "length"}
+  ],
+  "content_mix_mean_decode_tok_s": 29.10563843744059,
+  "content_mix_mean_end_to_end_tok_s": 27.983806596848183,
+  "greedy_parity": {
+    "identical": true,
+    "ar_decode_tok_s": 15.561314251970396,
+    "d1_decode_tok_s": 23.630830899242927,
+    "d2_decode_tok_s": 23.88115840035833,
+    "d3_decode_tok_s": 37.212908567455464,
+    "generated_tokens": 512,
+    "finish_reason": "length",
+    "output_sha256": "1631cdf9589516043f4263086d60314f74e9931ca8592a371f7cb2c282e54269"
+  },
+  "code_validation": {
+    "passed": true,
+    "decode_tok_s": 32.42597702830051,
+    "end_to_end_tok_s": 25.189782125908508,
+    "generated_tokens": 125,
+    "finish_reason": "stop",
+    "assertions": 6
+  },
+  "weights_in_repository": false
+}

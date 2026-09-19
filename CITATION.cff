@@ -4,6 +4,6 @@ title: "Qwen3.8-27B M1 Max MTPLX Benchmark"
 type: software
 authors:
   - family-names: "takuyantosnoopy"
-repository-code: "https://github.com/takuyantosnoopy/qwen38-m1max-mtplx-benchmark"
+repository-code: "https://github.com/Takuyan-labs/qwen38-m1max-mtplx-benchmark"
 license: MIT
 date-released: 2026-08-31

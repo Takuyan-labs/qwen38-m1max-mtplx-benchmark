@@ -130,6 +130,16 @@ Keep this process running. The API should become available at `http://127.0.0.1:
 
 For a 64 GB Mac, stop other large local-model servers before loading the 27B model to avoid swap or GPU-memory contention.
 
+### Use with Claude Code CLI
+
+With the server still running, open another terminal in this repository and run:
+
+```bash
+./scripts/claude-code-mtplx.sh
+```
+
+This routes Claude Code directly to MTPLX's Anthropic-compatible Messages API; it does not register the model in Ollama or change Claude Desktop. The launcher uses an isolated CLI config directory (`~/.claude/mtplx-27b`), removes any inherited `ANTHROPIC_API_KEY`, and starts with Claude Code's minimal `--bare` mode. On first run it copies the model-picker template only if the isolated profile has no settings file; it maps the custom ID to Claude Code's Sonnet client profile while keeping `qwen3.8-27b-mtplx` as the model sent to MTPLX. It explicitly adds the current project directory so its `CLAUDE.md` instructions remain available, while hooks, plugins, LSP, and auto-memory are skipped. The default effort is `low`; set `MTPLX_CLAUDE_EFFORT=medium` (or `high`) to trade speed for more deliberation. Set `MTPLX_CLAUDE_BARE=0` to use the full local Claude Code configuration instead. A minimal tool-loop smoke test succeeded; full-scale autonomous coding quality is not implied by that test.
+
 ### 3. Run the benchmark
 
 In another terminal:

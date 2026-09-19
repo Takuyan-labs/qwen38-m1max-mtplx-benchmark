@@ -92,6 +92,16 @@ python3 scripts/benchmark_content_mix.py
 
 再現時は、他の大規模モデルサーバーを停止してメモリ競合を避けてください。
 
+### Claude Code CLIから使う
+
+サーバーを起動したまま、別のターミナルでこのリポジトリに移動して実行します。
+
+```bash
+./scripts/claude-code-mtplx.sh
+```
+
+Claude Code CLIからMTPLXのAnthropic互換Messages APIへ直接接続します。Ollamaのモデル一覧に登録したり、Claude Desktopの設定を変更したりはしません。専用のCLI設定保存先`~/.claude/mtplx-27b`を使い、継承した`ANTHROPIC_API_KEY`も外すため、この起動ではAnthropicアカウントではなくローカル接続を使います。ツール呼び出しを実機確認できたClaude Codeの最小モード`--bare`を既定にし、作業ディレクトリを明示的に追加してプロジェクトの`CLAUDE.md`を読み込みます。一方、Hooks・Plugins・LSP・Auto Memoryは無効になります。初回起動時にモデル選択テンプレートを専用プロファイルへコピーします（既存の設定があれば上書きしません）。Qwen IDはSonnet相当のクライアント設定として扱いますが、MTPLXへ送るモデルIDは`qwen3.8-27b-mtplx`のままです。既定のEffortは`low`です。速度より熟考を優先する場合は`MTPLX_CLAUDE_EFFORT=medium`や`high`を指定できます。フル設定を試す場合は`MTPLX_CLAUDE_BARE=0`を指定します。Bashの読み取り専用ツール呼び出し一往復は確認済みですが、大規模な自律コーディング品質まで保証するものではありません。
+
 ## 正確な主張
 
 公開時は次の表現を推奨します。
