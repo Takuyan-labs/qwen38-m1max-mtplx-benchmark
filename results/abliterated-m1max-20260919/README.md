@@ -17,6 +17,10 @@ provenance, runtime settings, aggregate measurements, and output hashes.
 - Layout: 4-bit body, selected 8-bit modules, FP16 M1 auxiliary tensors, native MTP head
 - Payload size: about 20.3 GiB
 
+The artifact is a third-party Apache-2.0 derivative. Its refusal-direction
+projection can change refusal behavior; this is not a safety improvement or a
+guarantee of correctness. See the root [`THIRD_PARTY_NOTICES.md`](../../THIRD_PARTY_NOTICES.md).
+
 ## M1 Max measurement
 
 Host: Apple M1 Max, 32-core GPU, 64 GB unified memory. Runtime: MTPLX 2.9.0,

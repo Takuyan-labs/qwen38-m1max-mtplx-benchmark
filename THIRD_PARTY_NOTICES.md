@@ -22,6 +22,19 @@ The repository's original scripts, documentation, prompts, configuration, and an
 
 The mixed quantization, M1/M2 FP16 sibling conversion, MTP head, and runtime contract are upstream work. This repository's contribution is the M1 Max configuration, repeated measurement, ablation, audit trail, and reproducibility harness.
 
+## Abliterated companion artifact
+
+- Artifact: [`PocketAiHub/Qwen3.8-27B-Abliterated-MTPLX-Optimized-Speed`](https://huggingface.co/PocketAiHub/Qwen3.8-27B-Abliterated-MTPLX-Optimized-Speed)
+- Local measurement variant: `Qwen3.8-27B-Abliterated-MTPLX-Optimized-Speed-M1-FP16`
+- Base model: `Qwen/Qwen3.8-27B`, revision `1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0`
+- Conversion and refusal-direction projection: PocketAiHub
+- License: Apache-2.0; the artifact's `LICENSE` and `NOTICE` files govern the derivative
+- Safety note: abliteration changes refusal behavior; it is not a safety improvement or a guarantee of correctness or compliance
+
+The companion record under `results/abliterated-m1max-20260919/` does not
+redistribute the derivative weights. It publishes only provenance, aggregate
+measurements, hashes, and reproduction conditions.
+
 ## MTPLX
 
 - Project: [MTPLX](https://github.com/youssofal/MTPLX)
