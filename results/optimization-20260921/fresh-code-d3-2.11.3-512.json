@@ -1,0 +1,26 @@
+{
+  "runtime": "MTPLX 2.11.3",
+  "mlx": "0.32.2",
+  "mlx_lm": "0.31.3",
+  "model_revision": "c984b2932d29676a6dabb6431b27da7ca2411508",
+  "hardware": "Apple M1 Max 32-core GPU / 64GB",
+  "workload": "fresh fixed Python code prompt",
+  "prompt_tokens": 29,
+  "max_tokens": 512,
+  "sampling": {"temperature": 0, "top_p": 1, "top_k": 1, "seed": 123},
+  "cache": "bypass",
+  "mode": "native MTP D3",
+  "rows": [
+    {"run": 1, "decode_tok_s": 36.55202553964212, "client_final_output_tok_s": 32.922530278717794, "verify_calls": 135, "drafted_tokens": 403, "accepted_drafts": 377, "rejected_drafts": 15, "bonus_tokens": 119, "draft_time_s": 2.0287402009853395, "verify_time_s": 11.651619250173098, "target_forward_time_s": 12.0016752921656, "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a", "compiled_verify_calls": 135, "compiled_verify_fallback_calls": 0, "peak_memory_bytes": 21434775800},
+    {"run": 2, "decode_tok_s": 36.833470875823195, "client_final_output_tok_s": 35.847824024905734, "verify_calls": 135, "drafted_tokens": 403, "accepted_drafts": 377, "rejected_drafts": 15, "bonus_tokens": 119, "draft_time_s": 2.001605708937859, "verify_time_s": 11.588584171011462, "target_forward_time_s": 11.954051212014747, "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a", "compiled_verify_calls": 135, "compiled_verify_fallback_calls": 0, "peak_memory_bytes": 21434775800},
+    {"run": 3, "decode_tok_s": 36.61027588686482, "client_final_output_tok_s": 35.66826645270269, "verify_calls": 135, "drafted_tokens": 403, "accepted_drafts": 377, "rejected_drafts": 15, "bonus_tokens": 119, "draft_time_s": 1.9996800799272023, "verify_time_s": 11.639656633051345, "target_forward_time_s": 11.988253424060531, "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a", "compiled_verify_calls": 135, "compiled_verify_fallback_calls": 0, "peak_memory_bytes": 21434775800},
+    {"run": 4, "decode_tok_s": 36.51693269645173, "client_final_output_tok_s": 35.59155348797067, "verify_calls": 135, "drafted_tokens": 403, "accepted_drafts": 377, "rejected_drafts": 15, "bonus_tokens": 119, "draft_time_s": 2.021377168042818, "verify_time_s": 11.639016003027791, "target_forward_time_s": 11.98613746103365, "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a", "compiled_verify_calls": 135, "compiled_verify_fallback_calls": 0, "peak_memory_bytes": 21434775800},
+    {"run": 5, "decode_tok_s": 36.64455037144576, "client_final_output_tok_s": 35.69394146234364, "verify_calls": 135, "drafted_tokens": 403, "accepted_drafts": 377, "rejected_drafts": 15, "bonus_tokens": 119, "draft_time_s": 1.9933047080266988, "verify_time_s": 11.641837584174937, "target_forward_time_s": 11.992360418167664, "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a", "compiled_verify_calls": 135, "compiled_verify_fallback_calls": 0, "peak_memory_bytes": 21434775800}
+  ],
+  "median_decode_tok_s": 36.61027588686482,
+  "mean_decode_tok_s": 36.63145107404553,
+  "min_decode_tok_s": 36.51693269645173,
+  "max_decode_tok_s": 36.833470875823195,
+  "output_sha256_all_equal": true,
+  "note": "Latest runtime D3-only result; it does not update the older 2.9.0 short-burst maximum 39.897 tok/s."
+}

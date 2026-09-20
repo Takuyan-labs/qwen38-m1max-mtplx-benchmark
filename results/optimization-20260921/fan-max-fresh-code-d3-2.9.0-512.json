@@ -1,0 +1,45 @@
+{
+  "created_at": "2026-09-20T22:23:44.815726+00:00",
+  "purpose": "fan high-output retest: maximum fresh-code speed only",
+  "hardware": "Apple M1 Max 32-core GPU / 64 GB",
+  "model": "qwen3.8-27b-mtplx",
+  "model_artifact": "Youssofal/Qwen3.8-27B-MTPLX-Optimized-Speed-FP16",
+  "runtime": "MTPLX 2.9.0",
+  "mlx": "0.32.1",
+  "mlx_lm": "0.31.3",
+  "mode": "native MTP D3",
+  "workload": "fresh Python code generation",
+  "prompt": "Output only valid Python code implementing merge sort, binary search, and deterministic unit tests.",
+  "max_tokens": 512,
+  "sampling": {"temperature": 0, "top_p": 1, "top_k": 1, "seed": 123},
+  "cache": "bypass",
+  "fan": {
+    "user_reported": "external high-output mode",
+    "mtplx_health_fan_mode": "default",
+    "mtplx_health_fan_boost_active": false,
+    "mtplx_health_max_requested": false,
+    "mtplx_health_max_verified": false,
+    "note": "MTPLX could not verify an installed fan-control backend, so the external fan setting is not independently confirmed by the runtime."
+  },
+  "runs": [
+    {"run": 1, "decode_tok_s": 37.6392507547, "decode_elapsed_s": 13.6028212500, "generated_tokens": 512, "verify_calls": 135, "drafted_tokens": 403, "accepted_drafts": 377, "rejected_drafts": 15, "bonus_tokens": 119, "draft_time_s": 2.1462240510, "verify_time_s": 11.1241014130, "target_forward_time_s": 11.4588895380, "compiled_verify_calls": 135, "compiled_verify_fallback_calls": 0, "peak_memory_bytes": 23020242968, "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a"},
+    {"run": 2, "decode_tok_s": 37.8132285029, "decode_elapsed_s": 13.5402349990, "generated_tokens": 512, "verify_calls": 135, "drafted_tokens": 403, "accepted_drafts": 377, "rejected_drafts": 15, "bonus_tokens": 119, "draft_time_s": 2.1334910210, "verify_time_s": 11.0775620491, "target_forward_time_s": 11.4449466751, "compiled_verify_calls": 135, "compiled_verify_fallback_calls": 0, "peak_memory_bytes": 23020242968, "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a"},
+    {"run": 3, "decode_tok_s": 37.7967972530, "decode_elapsed_s": 13.5461212910, "generated_tokens": 512, "verify_calls": 135, "drafted_tokens": 403, "accepted_drafts": 377, "rejected_drafts": 15, "bonus_tokens": 119, "draft_time_s": 2.1411152450, "verify_time_s": 11.0765440920, "target_forward_time_s": 11.4150508420, "compiled_verify_calls": 135, "compiled_verify_fallback_calls": 0, "peak_memory_bytes": 23020242968, "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a"},
+    {"run": 4, "decode_tok_s": 37.8642156714, "decode_elapsed_s": 13.5220020000, "generated_tokens": 512, "verify_calls": 135, "drafted_tokens": 403, "accepted_drafts": 377, "rejected_drafts": 15, "bonus_tokens": 119, "draft_time_s": 2.1290377420, "verify_time_s": 11.0661362961, "target_forward_time_s": 11.4042846711, "compiled_verify_calls": 135, "compiled_verify_fallback_calls": 0, "peak_memory_bytes": 23020242968, "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a"},
+    {"run": 5, "decode_tok_s": 37.8783161569, "decode_elapsed_s": 13.5169683330, "generated_tokens": 512, "verify_calls": 135, "drafted_tokens": 403, "accepted_drafts": 377, "rejected_drafts": 15, "bonus_tokens": 119, "draft_time_s": 2.1279328390, "verify_time_s": 11.0608390840, "target_forward_time_s": 11.3970301680, "compiled_verify_calls": 135, "compiled_verify_fallback_calls": 0, "peak_memory_bytes": 23020242968, "output_sha256": "f6b04bacf2d8010b6053818dc193678ca1a7e8cf083f3347a4f7000e96cf0a9a"}
+  ],
+  "summary": {
+    "n": 5,
+    "mean_decode_tok_s": 37.7983616678,
+    "median_decode_tok_s": 37.8132285029,
+    "min_decode_tok_s": 37.6392507547,
+    "max_decode_tok_s": 37.8783161569,
+    "sample_stddev_tok_s": 0.0952224015,
+    "cv_percent": 0.2519220338,
+    "outputs_identical": true,
+    "old_short_d3_median_tok_s": 38.909,
+    "change_vs_old_short_d3_median_percent": -2.8162,
+    "old_short_d3_max_tok_s": 39.897,
+    "change_vs_old_short_d3_max_percent": -5.2229
+  }
+}

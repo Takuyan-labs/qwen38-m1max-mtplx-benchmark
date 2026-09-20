@@ -1,0 +1,20 @@
+{
+  "runtime": "MTPLX 2.11.3",
+  "model_revision": "c984b2932d29676a6dabb6431b27da7ca2411508",
+  "change": "MTPLX_PROJ_REQUANT=q4",
+  "hardware": "Apple M1 Max 32-core GPU / 64GB",
+  "prompt": "Output only valid Python code implementing merge sort, binary search, and deterministic unit tests.",
+  "max_tokens": 128,
+  "sampling": {"temperature": 0, "top_p": 1, "top_k": 1, "seed": 123},
+  "cache": "bypass",
+  "rows": [
+    {"mode": "ar", "decode_tok_s": 15.074836183574098, "verify_calls": 0, "drafted_tokens": 0, "accepted_drafts": 0, "output_sha256": "9aa47705ef0bccc3dcfd7e5d923084594bbc9dcbefe56bc26487ae5d44ffd318"},
+    {"mode": "mtp", "depth": 3, "decode_tok_s": 36.8236398249148, "verify_calls": 34, "drafted_tokens": 102, "accepted_drafts": 93, "accepted_by_depth": [32, 32, 29], "draft_time_s": 0.526089330058312, "verify_time_s": 2.862632416028646, "output_sha256": "9aa47705ef0bccc3dcfd7e5d923084594bbc9dcbefe56bc26487ae5d44ffd318"},
+    {"mode": "ar", "decode_tok_s": 15.092882839079442, "verify_calls": 0, "drafted_tokens": 0, "accepted_drafts": 0, "output_sha256": "9aa47705ef0bccc3dcfd7e5d923084594bbc9dcbefe56bc26487ae5d44ffd318"},
+    {"mode": "mtp", "depth": 3, "decode_tok_s": 36.83712422348921, "verify_calls": 34, "drafted_tokens": 102, "accepted_drafts": 93, "accepted_by_depth": [32, 32, 29], "draft_time_s": 0.5192287080863025, "verify_time_s": 2.873252128949389, "output_sha256": "9aa47705ef0bccc3dcfd7e5d923084594bbc9dcbefe56bc26487ae5d44ffd318"}
+  ],
+  "median_ar_tok_s": 15.08385951132677,
+  "median_d3_tok_s": 36.830382024032,
+  "baseline_2.11.3_clean_sha256": "1456341055cf2e3064286fb29a4307ecc15ef2645e0cfdd52addaf80c81445bb",
+  "decision": "reject: D3 gain was below 3% and greedy output changed relative to the baseline artifact path"
+}

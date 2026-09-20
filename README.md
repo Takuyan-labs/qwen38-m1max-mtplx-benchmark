@@ -1,19 +1,23 @@
-# Qwen3.8-27B on M1 Max: 2.10x in interleaved repeated runs with MTP D3
+# Qwen3.8-27B on M1 Max: MTPLX 2.11.3 current baseline
 
-Reproducible single-stream benchmark of Qwen3.8-27B on an Apple M1 Max (32-core GPU, 64 GB unified memory) using MTPLX 2.9.0 and MTP depth 3 speculative decoding.
+Reproducible single-stream benchmark of Qwen3.8-27B on an Apple M1 Max (32-core GPU, 64 GB unified memory) using the current pinned baseline MTPLX 2.11.3, MLX 0.32.2, and MTP depth 3 speculative decoding.
 
-> **Interleaved five-run medians: AR 13.89 tok/s, MTP D3 29.16 tok/s.**
+> **Current baseline (MTPLX 2.11.3): 38.932 tok/s median, 39.034 tok/s maximum** in a five-run, 512-token fresh Python-code D3 series.
+> The five outputs were SHA-identical, with 377 accepted drafts out of 403 and zero compiled-verify fallbacks.
+> The historical MTPLX 2.9.0 formal and burst records remain published below for comparison.
+
+> **Historical MTPLX 2.9.0 interleaved five-run medians: AR 13.89 tok/s, MTP D3 29.16 tok/s.**
 > Interleaved repeated-run speedup: **2.10x**. A shorter D3-only series reached 39.90 tok/s.
 > Prefix cache disabled. Greedy AR/D1/D2/D3 outputs were byte-identical.
 > Separate content-mix D3 medians: Japanese 18.67, English 22.28, Chinese 19.43, Python code 33.05 tok/s.
 
-This is not a claim that the 27B target model natively decodes at 29–40 tok/s. It is final-output throughput with speculative decoding. Only committed output tokens are counted; draft tokens are not. The primary result alternates AR and D3 across a multi-minute sequence to expose performance drift. It is not a long-duration endurance test or one continuous long response.
+This is not a claim that the 27B target model natively decodes at 29–40 tok/s. It is final-output throughput with speculative decoding. Only committed output tokens are counted; draft tokens are not. The historical primary result alternates AR and D3 across a multi-minute sequence to expose performance drift. It is not a long-duration endurance test or one continuous long response.
 
 [日本語版](README.ja.md) · [Technical article in Japanese](docs/article-ja.md)
 
 ## Result
 
-### Formal interleaved run: AR and D3, five runs each
+### Historical formal interleaved run: AR and D3, five runs each (MTPLX 2.9.0)
 
 | Metric | AR | MTP D3 |
 |---|---:|---:|
@@ -30,6 +34,21 @@ The monotonic decline across the multi-minute sequence is consistent with sustai
 ### Short D3-only series
 
 A separate five-run series immediately following warmup measured 35.201–39.897 tok/s, with a 38.909 tok/s median. It is published as a burst result, not the primary interleaved result.
+
+### Current MTPLX 2.11.3 fresh-code rerun
+
+Using the current pinned environment (`MTPLX 2.11.3`, `MLX 0.32.2`, `mlx-lm 0.31.3`, `transformers 5.12.1`) and the same model revision, prompt, greedy sampling, cache bypass, and native D3 path:
+
+| Metric | Value |
+|---|---:|
+| Runs | 5 |
+| Median server decode | **38.932 tok/s** |
+| Mean server decode | 38.949 tok/s |
+| Range | 38.849–39.034 tok/s |
+| Sample standard deviation | 0.073 tok/s |
+| Output hashes | identical |
+
+This is comparable to the historical 2.9.0 burst median (38.909 tok/s), but it does not exceed the historical 2.9.0 single-run maximum (39.897 tok/s). See [`fresh-code-d3-2.11.3-rerun-512.json`](results/optimization-20260921/fresh-code-d3-2.11.3-rerun-512.json).
 
 ### Greedy ablation
 
@@ -65,6 +84,8 @@ The observed speed differences tracked draft acceptance and output predictabilit
 
 As of 2026-08-31, the [exact FP16 artifact's model card](https://huggingface.co/Youssofal/Qwen3.8-27B-MTPLX-Optimized-Speed-FP16) says that its publisher has not published M1/M2 numbers. It reports 58.7 tok/s for the BF16 parent on an M5 Max coding task, under different sampling and stop conditions. That is useful context, not an apples-to-apples comparison. This repository therefore presents an auditable M1 Max data point rather than claiming an absolute rank.
 
+The follow-up runtime, profiling, depth, adaptive-policy, Context Copy, and mixed-quantization A/B experiments are documented in [M1_MAX_OPTIMIZATION_REPORT.md](M1_MAX_OPTIMIZATION_REPORT.md).
+
 ## What was measured
 
 - One request at a time (`serial`, `solo`)
@@ -87,7 +108,7 @@ The fixed prompt asks for Python implementations of merge sort and binary search
 | GPU | 32 cores |
 | Unified memory | 64 GB |
 | macOS | 26.6.2 (25G83) |
-| Runtime | MTPLX 2.9.0; MLX 0.32.1; mlx-lm 0.31.3 |
+| Runtime | MTPLX 2.11.3; MLX 0.32.2; mlx-lm 0.31.3; transformers 5.12.1 |
 | Model | `Youssofal/Qwen3.8-27B-MTPLX-Optimized-Speed-FP16` |
 | Model revision | `c984b2932d29676a6dabb6431b27da7ca2411508` |
 | Model format | MLX mixed quantization, M1/M2 FP16 variant |
@@ -115,6 +136,14 @@ hf download Youssofal/Qwen3.8-27B-MTPLX-Optimized-Speed-FP16 \
 
 The revision and artifact fingerprint are also recorded in [`model.lock.json`](model.lock.json).
 
+For the current baseline, use an isolated Python environment and install the pinned runtime dependencies:
+
+```bash
+python3 -m venv .venv-mtplx-2.11.3
+source .venv-mtplx-2.11.3/bin/activate
+python -m pip install "mtplx==2.11.3" "mlx==0.32.2" "mlx-lm==0.31.3" "transformers==5.12.1"
+```
+
 > Powered by MTPLX by Youssof Altoukhi — https://github.com/youssofal/MTPLX
 
 ### 2. Start the server
@@ -125,6 +154,8 @@ export MODEL_PATH="/absolute/path/to/Qwen3.8-27B-MTPLX-Optimized-Speed-FP16"
 export MTPLX_BIN="mtplx"
 ./scripts/start_server.sh
 ```
+
+The launcher checks for MTPLX 2.11.3 by default. Set `MTPLX_ALLOW_VERSION_MISMATCH=1` only when intentionally reproducing a historical runtime result.
 
 Keep this process running. The API should become available at `http://127.0.0.1:18038/v1`.
 
@@ -156,6 +187,17 @@ To repeat the Japanese/English/Chinese/code content-mix run:
 python3 scripts/benchmark_content_mix.py
 ```
 
+To run the more expensive fixed-depth sweep (AR, D1, D2, and D3 for every
+content prompt, five repetitions by default):
+
+```bash
+python3 scripts/benchmark_content_depths.py --runs 5 --tokens 512 --output-dir results/raw/content-depths-YYYYMMDD
+```
+
+This writes JSONL rows with final-output hashes, server timing counters,
+acceptance, verification counts, context-copy counters, and memory fields.
+Unavailable runtime counters remain `null`; the harness never estimates them.
+
 Required command-line tools: Python 3. The server-start and safe-system-info helpers also use standard macOS shell tools and `jq`.
 
 ### 4. Capture safe system metadata
@@ -174,6 +216,7 @@ The script deliberately excludes serial numbers, UUIDs, and provisioning identif
 - [`results/content-mix-2026-09-01/summary.json`](results/content-mix-2026-09-01/summary.json)
 - [`results/content-mix-2026-09-01/raw-runs.jsonl`](results/content-mix-2026-09-01/raw-runs.jsonl)
 - [`results/m1max-1024-d3.json`](results/m1max-1024-d3.json)
+- [`results/optimization-20260921/fresh-code-d3-2.11.3-rerun-512.json`](results/optimization-20260921/fresh-code-d3-2.11.3-rerun-512.json)
 - [`results/system.json`](results/system.json)
 - [`model.lock.json`](model.lock.json)
 - [`results/README.md`](results/README.md) — data and generated-output scope
@@ -188,7 +231,7 @@ That combination reduced the effective target-model iteration count while preser
 
 This repository documents a local measurement, not an independently certified world record. A defensible public description is:
 
-> Qwen3.8-27B reached a 29.16 output tok/s interleaved repeated-run median (n=5) on a 32-GPU-core M1 Max 64 GB using MTPLX 2.9.0 native MTP D3 speculative decoding, versus a 13.89 tok/s interleaved AR median (2.10x). A separate short D3-only series peaked at 39.90 tok/s. This was a 29-token-prompt/512-token-output greedy single-stream microbenchmark with prefix caching bypassed.
+> Current baseline: Qwen3.8-27B reached a 38.932 tok/s median and 39.034 tok/s maximum in a five-run fresh-code D3 series on a 32-GPU-core M1 Max 64 GB using MTPLX 2.11.3, with cache bypass and greedy sampling. Historical MTPLX 2.9.0 records remain available: 29.16 tok/s interleaved D3 median and 39.90 tok/s short-burst maximum.
 
 Comparisons with NVIDIA or newer Apple Silicon results require matching the model artifact, prompt length, output length, quantization, cache state, sampling, and throughput definition.
 

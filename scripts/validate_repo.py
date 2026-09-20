@@ -128,13 +128,11 @@ def validate_content_mix_results(errors: list[str]) -> None:
         errors.append("content-mix model revision does not match model.lock.json")
     if metadata.get("artifact_fingerprint") != model_lock.get("mtplx_artifact_fingerprint"):
         errors.append("content-mix artifact fingerprint does not match model.lock.json")
-    expected_runtime = {
-        "mtplx": environment_lock.get("mtplx"),
-        "mlx": environment_lock.get("mlx"),
-        "mlx_lm": environment_lock.get("mlx_lm"),
-    }
+    # The published content-mix run is a historical 2.9.0 measurement.  Keep
+    # it immutable while the top-level lock tracks the current 2.11.3 setup.
+    expected_runtime = environment_lock.get("historical_content_mix_runtime", {})
     if metadata.get("runtime") != expected_runtime:
-        errors.append("content-mix runtime versions do not match environment.lock.json")
+        errors.append("content-mix runtime versions do not match historical_content_mix_runtime")
     expected_hardware = {
         "chip": system_info.get("hardware", {}).get("chip"),
         "gpu_cores": system_info.get("hardware", {}).get("gpu_cores"),

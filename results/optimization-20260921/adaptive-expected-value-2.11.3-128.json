@@ -1,0 +1,17 @@
+{
+  "runtime": "MTPLX 2.11.3",
+  "model_revision": "c984b2932d29676a6dabb6431b27da7ca2411508",
+  "policy": "expected_value",
+  "hardware": "Apple M1 Max 32-core GPU / 64GB",
+  "prompt": "Output only valid Python code implementing merge sort, binary search, and deterministic unit tests.",
+  "max_tokens": 128,
+  "sampling": {"temperature": 0, "top_p": 1, "top_k": 1, "seed": 123},
+  "cache": "bypass",
+  "rows": [
+    {"decode_tok_s": 34.821374281244466, "effective_depth": 3, "verify_calls": 34, "drafted_tokens": 100, "accepted_drafts": 94, "draft_time_s": 0.6532041619502706, "verify_time_s": 2.947364998035482, "output_sha256": "1456341055cf2e3064286fb29a4307ecc15ef2645e0cfdd52addaf80c81445bb"},
+    {"decode_tok_s": 34.92144000970955, "effective_depth": 3, "verify_calls": 34, "drafted_tokens": 100, "accepted_drafts": 94, "draft_time_s": 0.653313285933109, "verify_time_s": 2.9106852449913276, "output_sha256": "1456341055cf2e3064286fb29a4307ecc15ef2645e0cfdd52addaf80c81445bb"},
+    {"decode_tok_s": 35.16849855335044, "effective_depth": 3, "verify_calls": 34, "drafted_tokens": 100, "accepted_drafts": 94, "draft_time_s": 0.6446694610349368, "verify_time_s": 2.9032377929543145, "output_sha256": "1456341055cf2e3064286fb29a4307ecc15ef2645e0cfdd52addaf80c81445bb"}
+  ],
+  "median_decode_tok_s": 34.92144000970955,
+  "note": "The policy stayed at effective depth 3 for all three requests; this is not an adaptive-depth diversity test."
+}

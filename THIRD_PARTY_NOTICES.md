@@ -39,10 +39,11 @@ measurements, hashes, and reproduction conditions.
 
 - Project: [MTPLX](https://github.com/youssofal/MTPLX)
 - Author: Youssof Altoukhi
-- Version measured: 2.9.0
-- License: Apache-2.0 — [v2.9.0 LICENSE](https://github.com/youssofal/MTPLX/blob/v2.9.0/LICENSE)
-- Attribution terms: [v2.9.0 NOTICE](https://github.com/youssofal/MTPLX/blob/v2.9.0/NOTICE)
-- Citation metadata: [v2.9.0 CITATION.cff](https://github.com/youssofal/MTPLX/blob/v2.9.0/CITATION.cff)
+- Current baseline: 2.11.3
+- Current license: Apache-2.0 — [v2.11.3 LICENSE](https://github.com/youssofal/MTPLX/blob/v2.11.3/LICENSE)
+- Current attribution terms: [v2.11.3 NOTICE](https://github.com/youssofal/MTPLX/blob/v2.11.3/NOTICE)
+- Current citation metadata: [v2.11.3 CITATION.cff](https://github.com/youssofal/MTPLX/blob/v2.11.3/CITATION.cff)
+- Historical published measurements: MTPLX 2.9.0 — [v2.9.0 LICENSE](https://github.com/youssofal/MTPLX/blob/v2.9.0/LICENSE), [NOTICE](https://github.com/youssofal/MTPLX/blob/v2.9.0/NOTICE), [CITATION.cff](https://github.com/youssofal/MTPLX/blob/v2.9.0/CITATION.cff)
 
 Required benchmark credit, displayed in the README files, technical article, and server-start helper:
 
@@ -50,7 +51,8 @@ Required benchmark credit, displayed in the README files, technical article, and
 
 ## Runtime dependencies not redistributed here
 
-- [MLX](https://github.com/ml-explore/mlx), measured version 0.32.1 — MIT License
+- [MLX](https://github.com/ml-explore/mlx), current baseline version 0.32.2; historical content-mix version 0.32.1 — MIT License
 - [mlx-lm](https://github.com/ml-explore/mlx-lm), measured version 0.31.3 — MIT License
+- [Transformers](https://github.com/huggingface/transformers), current baseline version 5.12.1 — Apache-2.0 License
 
 All trademarks, model weights, and third-party software remain subject to their respective owners' terms.
