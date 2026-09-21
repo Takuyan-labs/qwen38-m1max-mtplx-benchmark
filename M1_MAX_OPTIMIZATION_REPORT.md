@@ -22,6 +22,8 @@ Target artifact fingerprint: `sha256:069c2de291fd15b130383119b13f60c45e0f78481a1
 * Prefillでは既存のGDN blocked kernelが実際に長文経路へ適用されたが、n=5比較でも+1.2〜1.3%に留まり、+3%の採用基準未達。async-rungsも標準経路より約1%遅く不採用。
 * 長文prefillのcleanup無効化は16Kだけでは+2.57%だったが、32Kでは-0.86%、every8では-3.27%となり、標準autoを置き換える再現性はなかった。
 * 16KのMTP history `last_window=8192`はhistory時間を2.353秒から1.128秒へ削減し、TTFTを約1.94%改善した。ただしfull decodeの受理率・出力一致を未確認のため、標準設定には採用していない。
+* 同一artifactをoMLX 0.7.0.dev4のANE/GPU経路でも実測した。3478-token prompt、max_tokens=1、n=3ではGPU-only 153.0 tok/s、ANE有効152.9 tok/s（-0.07%）。ANEは8 MLP層だけ、GDNは0層で、現artifactに対する実用的な改善は確認できなかった。
+* DeepSeek V4/V4.1のCSA/CSA2、CED、FP4 KV、DSparkはQwen3.8へdrop-in移植できない。これらは専用attention/indexer、encoder-decoder分割、学習済みdraftを前提にするため、今回のM1 cold prefill改造には採用しなかった。
 
 ### 現時点の推奨設定
 
@@ -287,6 +289,8 @@ MTP sidecarはすでにINT4/group64/prequantizedであり、CLIでbitsだけを�
 | 長文cleanup off/every8 | 不採用 | 16K単発では+2.57%だが、32Kで-0.86%/-3.27% |
 | `contiguous_then_repage` | 不採用 | 16Kで125.54 tok/s、autoの144.17より低下 |
 | MTP `last_window=8192` | 保留 | 16K TTFT +1.94%だが、full decode acceptance/出力一致未検証 |
+| oMLX ANE/GPU prefill | 不採用 | 同一artifactで153.0→152.9 tok/s（n=3、-0.07%）。8 MLP/0 GDNのみ有効 |
+| DeepSeek CED/CSA/DSpark移植 | 不実施 | Qwen3.8の学習済み構造・GDN/attentionと非互換。prefill drop-inではない |
 | MTP head bit変更 | 不実施 | prequantized INT4 sidecarで、単純変更が正当なA/Bにならない |
 | Splash/DFlash/Metal移植 | 不実施 | M1非対応またはkernel全面改造であり、今回の停止条件に該当 |
 
@@ -339,6 +343,7 @@ MTP sidecarはすでにINT4/group64/prequantizedであり、CLIでbitsだけを�
 * Context Copy ON/OFF: [`results/optimization-20260921/context-copy/`](results/optimization-20260921/context-copy/)
 * Mixed quant: [`results/optimization-20260921/mixed-quant-proj-requant-q4-2.11.3-128.json`](results/optimization-20260921/mixed-quant-proj-requant-q4-2.11.3-128.json)
 * Prefill baseline/chunk/rungs/GDN/long ladder: `results/raw/prefill-baseline-*`, `results/raw/prefill-chunk*`, `results/raw/prefill-rungs8-ar-20260921`, `results/raw/prefill-gdnblocked*-ar-20260921`, `results/raw/prefill-gdn-force-stock-ar-n5-20260921`, `results/raw/prefill-ladder-*-20260921.json`（raw結果は`.gitignore`対象）
+* ANE/GPU hybrid（同一artifact、oMLX隔離A/B）: [`results/optimization-20260921/ane-hybrid-omlx-qwen38.json`](results/optimization-20260921/ane-hybrid-omlx-qwen38.json)
 * Depth sweep harness: [`scripts/benchmark_content_depths.py`](scripts/benchmark_content_depths.py)
 * Context Copy harness: [`scripts/benchmark_context_copy.py`](scripts/benchmark_context_copy.py)
 
@@ -347,3 +352,18 @@ MTP sidecarはすでにINT4/group64/prequantizedであり、CLIでbitsだけを�
 M1 Maxのこのartifactでは、fresh codeの追加高速化余地は残っているが、今回の安全な高水準A/Bで3%以上の改善を再現できる変更は見つからなかった。既存のOptimized-Speed-FP16 + native MTP D3は、受理率が高いPythonコードではすでに良いbit allocationとruntime経路にあり、次の大きな改善はmixed quantの小変更ではなく、M1向けverify kernelのprofileと設計になる可能性が高い。
 
 一方、実際のCoding Agent用途に近いRewrite/EditではContext Copyが明確に効いた。速度記録を一つに混ぜず、fresh生成、rewrite、copy利用、cache利用を別ベンチとして公開するのが、現時点で最も実用的な改善である。
+
+### 14.1 ANE + GPU hybridの判定
+
+最新oMLXを別venvでビルドし、同じモデルディレクトリを`--no-cache`・batch 1でロードした。ANE有効時のログは、`Eagerly compiled and enabled ANE/GPU Qwen prefill on 8 MLPs`、`gdn_layers=0`、`dual_ane=false`であり、フル64層のANE化ではない。GPU-only 3回とANE有効3回の`/api/status`集計は次の通りである。
+
+| 経路 | 実測prompt | n | prefill tok/s | 実効ANE | resident memory |
+|---|---:|---:|---:|---|---:|
+| oMLX GPU-only | 3,478 tokens | 3 | 153.0 | 0 MLP / 0 GDN | 20.23 GB |
+| oMLX ANE/GPU | 3,478 tokens | 3 | 152.9 | 8 MLP / 0 GDN | 20.23 GB |
+
+出力は全6回で1 tokenの`Apple`（SHA-256一致）だったが、これはmax_tokens=1の弱いparity checkである。したがって、速度差は採用閾値の+3%に遠く、現時点の最速MTPLX構成へ取り込まない。oMLX側のQwen ANE実装はq4/q5/q6/q8・group64/128を主対象とし、今回artifactの主量子化q4/group32と8bit例外の組み合わせでは一部層しか適格にならない。別のoQ4e artifactでM1 Max +47%という公開PR値はあるが、quantization・runtime・固定2048 tileが異なるため、今回の153 tok/sへ外挿しない。
+
+### 14.2 DeepSeek由来方式の判定
+
+DeepSeek V4/V4.1のcompressed sparse attention（CSA/CSA2）、cross-layer KV reuse、FP4 KV、CED bounded replay、DSparkは、Qwen3.8へ後付けできる一般的なprefillフラグではない。Qwen3.8はqwen3_5のGDN＋通常attentionで、DeepSeekのindexer・compressed attention・encoder/decoder分割・専用draft moduleを持たない。無理にattentionを末尾windowだけにすると出力と品質が変わるため、greedy SHA一致を保つ今回の採用条件に反する。DeepSeekから安全に借りられるのは既に保留しているprefix/session再利用（warm TTFT）であり、cold prefill高速化とは別競技である。

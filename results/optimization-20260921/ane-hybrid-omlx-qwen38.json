@@ -1,0 +1,50 @@
+{
+  "date": "2026-09-21",
+  "hardware": "Apple M1 Max 32-core GPU 64GB",
+  "macos": "27.0",
+  "model": "Youssofal/Qwen3.8-27B-MTPLX-Optimized-Speed-FP16",
+  "revision": "c984b2932d29676a6dabb6431b27da7ca2411508",
+  "artifact_sha256": "069c2de291fd15b130383119b13f60c45e0f78481a180cf51887ae87c3986b12",
+  "runtime": "oMLX 0.7.0.dev4 source commit 6b04ffb",
+  "mlx": "0.32.2",
+  "mlx_lm": "0.32.0",
+  "python": "3.13.3",
+  "workload": {
+    "prompt_tokens": 3478,
+    "max_tokens": 1,
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "top_k": 1,
+    "thinking": false,
+    "cache": "disabled",
+    "batch": 1,
+    "output_sha256": "f223faa96f22916294922b171a2696d868fd1f9129302eb41a45b2a2ea2ebbfd",
+    "output_text_bytes": 5,
+    "output_text_note": "All runs returned the one-token output Apple; only a one-token parity check."
+  },
+  "gpu_only": {
+    "runs": 3,
+    "server_avg_prefill_tps": 153.0,
+    "prompt_tokens": 10434,
+    "completion_tokens": 3,
+    "ane_configured_models": 0,
+    "memory_used_bytes": 21717401618
+  },
+  "ane_gpu": {
+    "runs": 3,
+    "server_avg_prefill_tps": 152.9,
+    "prompt_tokens": 10434,
+    "completion_tokens": 3,
+    "sequence_length": 2048,
+    "ane_fraction": 0.53,
+    "dual_ane": false,
+    "gdn_requested": true,
+    "ane_mlp_layers": 8,
+    "ane_gdn_layers": 0,
+    "resident_programs": 8,
+    "memory_used_bytes": 21717401618
+  },
+  "delta_percent": -0.0653594771,
+  "decision": "reject: no measurable prefill gain; ANE path was partial (8 MLP layers, 0 GDN) and below the 3% adoption threshold",
+  "caveat": "This is an oMLX A/B, not the MTPLX baseline. The artifact is mixed q4-g32/q8 and does not receive the full oMLX q4-g64/128 ANE path."
+}
