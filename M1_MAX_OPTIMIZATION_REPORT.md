@@ -20,6 +20,8 @@ Target artifact fingerprint: `sha256:069c2de291fd15b130383119b13f60c45e0f78481a1
 * stock MTPLX 2.11.3にRAMP実装は見つからなかったため、独自再実装は行わず保留した。
 * `MTPLX_PROJ_REQUANT=q4`（対象は主に上位MLPのq8→q4）ではD3 36.83 tok/s前後だったが、baselineとgreedy出力SHAが変わり、受理率も低下したため不採用。
 * Prefillでは既存のGDN blocked kernelが実際に長文経路へ適用されたが、n=5比較でも+1.2〜1.3%に留まり、+3%の採用基準未達。async-rungsも標準経路より約1%遅く不採用。
+* 長文prefillのcleanup無効化は16Kだけでは+2.57%だったが、32Kでは-0.86%、every8では-3.27%となり、標準autoを置き換える再現性はなかった。
+* 16KのMTP history `last_window=8192`はhistory時間を2.353秒から1.128秒へ削減し、TTFTを約1.94%改善した。ただしfull decodeの受理率・出力一致を未確認のため、標準設定には採用していない。
 
 ### 現時点の推奨設定
 
@@ -235,6 +237,24 @@ MTPLX 2.11.3に既存のGated DeltaNet blocked-prefill kernelを、モデル形�
 
 これは約99.97%のTTFT短縮だが、prefill計算を高速化した値ではなく、同一prefixの再計算を省略した値である。したがってsingle-stream decode記録やcold prefill記録とは混ぜず、agentの継続ターン性能として報告する。
 
+### 8.8 長文prefillのcleanup・layout・MTP history A/B
+
+MTPLX内蔵のrich `prefill-ladder`を、各条件fresh process、ARはstock、`max_tokens=1`で実行した。各行は1回の探索値であり、n=5の正式記録ではない。
+
+| 条件 | 実測context | prefill tok/s | TTFT | 補足 |
+|---|---:|---:|---:|---|
+| AR / turbo標準cleanup | 16,384 | 144.17 | 113.67 s | route=`contiguous_dense_decode`, cleanup 2回 |
+| AR / cleanup off | 16,384 | 147.87 | 110.82 s | +2.57%、単発 |
+| AR / GDN blocked TB32 | 16,384 | 141.65 | 115.70 s | 標準より低下 |
+| AR / `contiguous_then_repage` | 16,384 | 125.54 | 130.53 s | 明確に低下 |
+| AR / turbo標準cleanup | 32,768 | 138.79 | 236.12 s | cleanup 4回 |
+| AR / cleanup off | 32,768 | 137.59 | 238.18 s | -0.86% |
+| AR / cleanup every8 | 32,768 | 134.25 | 244.11 s | -3.27% |
+| MTP D3 / committed history | 16,384 | 139.20 | 117.73 s | history 2.353 s |
+| MTP D3 / `last_window=8192` | 16,384 | 141.96 | 115.44 s | history 1.128 s、+1.98% |
+
+cleanupは短文のように常に害になるわけではなく、32Kでは無効化・every8とも標準より遅かった。layoutもautoの`contiguous_dense_decode`が最良だった。MTPの`last_window`は履歴処理だけを約52%削減したが、prefill-ladderはmax_tokens=1であり、長いdecodeのacceptanceやgreedy出力SHAを検証していないため、候補として保留する。
+
 ## 9. Mixed quantization探索
 
 安全な候補として、artifactの8-bit保持領域のうちMTPLXが対象にする上位MLP projectionを`MTPLX_PROJ_REQUANT=q4`で再量子化した。embedding、lm_head、linear_attn.out_proj、expert bank、MTP sidecarは変更していない。
@@ -262,8 +282,11 @@ MTP sidecarはすでにINT4/group64/prequantizedであり、CLIでbitsだけを�
 | 中国語のD3採用 | 保留 | 速度は最速だがSHA不一致 |
 | RAMP | 保留 | stock実装なし。独自実装は範囲外 |
 | q8→q4 projection requant | 不採用 | D3 +0.5%程度、baseline SHA変更、受理率低下 |
-| GDN blocked prefill | 保留/不採用 | kernel適用は確認したが、force-stock対照との差が再runで+0.1%未満（n=2） |
+| GDN blocked prefill | 保留/不採用 | kernel適用は確認したが、長文を含むA/Bでも+1.2〜1.3%で+3%未達 |
 | Prefill async rungs=8 | 不採用 | 標準chunk2048より約1%遅い予備A/B |
+| 長文cleanup off/every8 | 不採用 | 16K単発では+2.57%だが、32Kで-0.86%/-3.27% |
+| `contiguous_then_repage` | 不採用 | 16Kで125.54 tok/s、autoの144.17より低下 |
+| MTP `last_window=8192` | 保留 | 16K TTFT +1.94%だが、full decode acceptance/出力一致未検証 |
 | MTP head bit変更 | 不実施 | prequantized INT4 sidecarで、単純変更が正当なA/Bにならない |
 | Splash/DFlash/Metal移植 | 不実施 | M1非対応またはkernel全面改造であり、今回の停止条件に該当 |
 
@@ -315,7 +338,7 @@ MTP sidecarはすでにINT4/group64/prequantizedであり、CLIでbitsだけを�
 * Adaptive: [`results/optimization-20260921/adaptive-expected-value-2.11.3-128.json`](results/optimization-20260921/adaptive-expected-value-2.11.3-128.json)
 * Context Copy ON/OFF: [`results/optimization-20260921/context-copy/`](results/optimization-20260921/context-copy/)
 * Mixed quant: [`results/optimization-20260921/mixed-quant-proj-requant-q4-2.11.3-128.json`](results/optimization-20260921/mixed-quant-proj-requant-q4-2.11.3-128.json)
-* Prefill baseline/chunk/rungs/GDN: `results/raw/prefill-baseline-*`, `results/raw/prefill-chunk*`, `results/raw/prefill-rungs8-ar-20260921`, `results/raw/prefill-gdnblocked*-ar-20260921`, `results/raw/prefill-gdn-force-stock-ar-n5-20260921`（raw結果は`.gitignore`対象）
+* Prefill baseline/chunk/rungs/GDN/long ladder: `results/raw/prefill-baseline-*`, `results/raw/prefill-chunk*`, `results/raw/prefill-rungs8-ar-20260921`, `results/raw/prefill-gdnblocked*-ar-20260921`, `results/raw/prefill-gdn-force-stock-ar-n5-20260921`, `results/raw/prefill-ladder-*-20260921.json`（raw結果は`.gitignore`対象）
 * Depth sweep harness: [`scripts/benchmark_content_depths.py`](scripts/benchmark_content_depths.py)
 * Context Copy harness: [`scripts/benchmark_context_copy.py`](scripts/benchmark_context_copy.py)
 
