@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "experiment": "long-context ANE/GPU prefill A/B",
+  "date": "2026-09-21",
+  "hardware": {
+    "machine": "Apple M1 Max",
+    "gpu_cores": 32,
+    "unified_memory_gb": 64,
+    "macos": "27.0"
+  },
+  "artifact": {
+    "model": "Youssofal/Qwen3.8-27B-MTPLX-Optimized-Speed-FP16",
+    "revision": "c984b2932d29676a6dabb6431b27da7ca2411508",
+    "sha256": "069c2de291fd15b130383119b13f60c45e0f78481a180cf51887ae87c3986b12"
+  },
+  "runtime": {
+    "server": "oMLX 0.7.0.dev4",
+    "mlx": "0.32.2",
+    "mlx_lm": "0.32.0 git-pinned in isolated venv",
+    "batch_size": 1,
+    "cache": "disabled (--no-cache, X-Cache-Prompt=false)",
+    "max_tokens": 1,
+    "sampling": "temperature=0, top_p=1, top_k=1, thinking=false",
+    "ane_sequence_length": 2048,
+    "ane_dual": false,
+    "ane_fraction": 0.53,
+    "ane_gdn_enabled": true,
+    "effective_ane_layers": "8 MLP / 0 GDN"
+  },
+  "measurements": [
+    {
+      "condition": "GPU-only",
+      "prompt_tokens": 16799,
+      "runs": 3,
+      "total_prompt_tokens": 50397,
+      "total_prefill_seconds": 353.8355969589902,
+      "aggregate_prefill_tok_s": 142.43055371797723,
+      "reported_avg_prefill_tok_s": 142.4,
+      "resident_model_memory_gb": 20.23,
+      "output_texts": ["Under", "Under", "Under"],
+      "output_equal_with_ane": true,
+      "status": "completed"
+    },
+    {
+      "condition": "ANE/GPU",
+      "prompt_tokens": 16799,
+      "runs": 3,
+      "total_prompt_tokens": 50397,
+      "total_prefill_seconds": 349.50356991699664,
+      "aggregate_prefill_tok_s": 144.1959520240916,
+      "reported_avg_prefill_tok_s": 144.2,
+      "resident_model_memory_gb": 20.23,
+      "effective_ane_layers": "8 MLP / 0 GDN",
+      "output_texts": ["Under", "Under", "Under"],
+      "output_equal_with_gpu_only": true,
+      "status": "completed"
+    },
+    {
+      "condition": "GPU-only",
+      "prompt_tokens": 31600,
+      "runs": 1,
+      "total_prompt_tokens": 31600,
+      "total_prefill_seconds": 259.4417407089786,
+      "aggregate_prefill_tok_s": 121.7999845115378,
+      "resident_model_memory_gb": 20.23,
+      "status": "completed"
+    },
+    {
+      "condition": "ANE/GPU",
+      "prompt_tokens": 31600,
+      "runs": 0,
+      "total_prompt_tokens": 0,
+      "aggregate_prefill_tok_s": null,
+      "resident_model_memory_gb": 20.23,
+      "effective_ane_layers": "8 MLP / 0 GDN",
+      "status": "failed_before_request",
+      "error": "Metal command buffer Insufficient Memory (kIOGPUCommandBufferCallbackErrorOutOfMemory)"
+    }
+  ],
+  "derived": {
+    "delta_16k_percent": 1.239480055388964,
+    "adoption_threshold_percent": 3.0,
+    "decision": "reject as default; long 16K gain is below threshold and 32K ANE run is not viable on 64GB",
+    "interpretation": "ANE does not become strongly advantageous for this artifact merely by increasing context. The current oMLX path compiles only 8 MLP layers because the artifact is primarily q4/group32, while the ANE affine path favors group64/128 shapes."
+  },
+  "notes": [
+    "All requests used the same deterministic repeated-text prompt; prompt was sent fresh with no prefix/session cache.",
+    "max_tokens=1 gives only a weak output parity check; it was deliberately used to isolate prefill.",
+    "The 32K GPU-only run completed once; a second run OOMed after the first long KV allocation. The ANE 32K run failed before the request was counted."
+  ]
+}

@@ -23,6 +23,7 @@ Target artifact fingerprint: `sha256:069c2de291fd15b130383119b13f60c45e0f78481a1
 * 長文prefillのcleanup無効化は16Kだけでは+2.57%だったが、32Kでは-0.86%、every8では-3.27%となり、標準autoを置き換える再現性はなかった。
 * 16KのMTP history `last_window=8192`はhistory時間を2.353秒から1.128秒へ削減し、TTFTを約1.94%改善した。ただしfull decodeの受理率・出力一致を未確認のため、標準設定には採用していない。
 * 同一artifactをoMLX 0.7.0.dev4のANE/GPU経路でも実測した。3478-token prompt、max_tokens=1、n=3ではGPU-only 153.0 tok/s、ANE有効152.9 tok/s（-0.07%）。ANEは8 MLP層だけ、GDNは0層で、現artifactに対する実用的な改善は確認できなかった。
+* 長文でも同じ傾向だった。16,799-token promptではGPU-only 142.43 tok/s、ANE/GPU 144.20 tok/s（+1.24%、各n=3）。32,000-token相当ではGPU-onlyが121.80 tok/s（n=1）まで低下し、ANE/GPUはMetalのInsufficient Memoryでリクエスト開始前に失敗した。長文だからANEが強い、とはこのartifact・64GBでは確認できない。
 * DeepSeek V4/V4.1のCSA/CSA2、CED、FP4 KV、DSparkはQwen3.8へdrop-in移植できない。これらは専用attention/indexer、encoder-decoder分割、学習済みdraftを前提にするため、今回のM1 cold prefill改造には採用しなかった。
 
 ### 現時点の推奨設定
@@ -344,6 +345,7 @@ MTP sidecarはすでにINT4/group64/prequantizedであり、CLIでbitsだけを�
 * Mixed quant: [`results/optimization-20260921/mixed-quant-proj-requant-q4-2.11.3-128.json`](results/optimization-20260921/mixed-quant-proj-requant-q4-2.11.3-128.json)
 * Prefill baseline/chunk/rungs/GDN/long ladder: `results/raw/prefill-baseline-*`, `results/raw/prefill-chunk*`, `results/raw/prefill-rungs8-ar-20260921`, `results/raw/prefill-gdnblocked*-ar-20260921`, `results/raw/prefill-gdn-force-stock-ar-n5-20260921`, `results/raw/prefill-ladder-*-20260921.json`（raw結果は`.gitignore`対象）
 * ANE/GPU hybrid（同一artifact、oMLX隔離A/B）: [`results/optimization-20260921/ane-hybrid-omlx-qwen38.json`](results/optimization-20260921/ane-hybrid-omlx-qwen38.json)
+* ANE/GPU hybrid長文A/B（16K/32K）: [`results/optimization-20260921/ane-hybrid-omlx-long.json`](results/optimization-20260921/ane-hybrid-omlx-long.json)
 * Depth sweep harness: [`scripts/benchmark_content_depths.py`](scripts/benchmark_content_depths.py)
 * Context Copy harness: [`scripts/benchmark_context_copy.py`](scripts/benchmark_context_copy.py)
 
@@ -364,6 +366,21 @@ M1 Maxのこのartifactでは、fresh codeの追加高速化余地は残って�
 
 出力は全6回で1 tokenの`Apple`（SHA-256一致）だったが、これはmax_tokens=1の弱いparity checkである。したがって、速度差は採用閾値の+3%に遠く、現時点の最速MTPLX構成へ取り込まない。oMLX側のQwen ANE実装はq4/q5/q6/q8・group64/128を主対象とし、今回artifactの主量子化q4/group32と8bit例外の組み合わせでは一部層しか適格にならない。別のoQ4e artifactでM1 Max +47%という公開PR値はあるが、quantization・runtime・固定2048 tileが異なるため、今回の153 tok/sへ外挿しない。
 
-### 14.2 DeepSeek由来方式の判定
+### 14.2 長文prefillでANEが強いか
+
+「長文ではANEが強い」という仮説を、同じartifact・同じoMLX 0.7.0.dev4・同じ2048-token ANE tile・`--no-cache`で検証した。GPU-onlyとANE/GPUを別base pathの新規プロセスで起動し、同じ反復テキストをfresh送信した。測定値は各baseの`/api/status`集計（`total_prompt_tokens / total_prefill_duration`）であり、cache hitやdecode速度は混ぜていない。
+
+| 条件 | prompt | n | prefill tok/s | 実効ANE | 結果 |
+|---|---:|---:|---:|---|---|
+| GPU-only | 16,799 | 3 | **142.43** | 0 MLP / 0 GDN | 完走 |
+| ANE/GPU | 16,799 | 3 | **144.20** | 8 MLP / 0 GDN | 完走、出力`Under`一致 |
+| GPU-only | 31,600 | 1 | **121.80** | 0 MLP / 0 GDN | 完走 |
+| ANE/GPU | 31,600 | 0 | — | 8 MLP / 0 GDN | Metal `Insufficient Memory`で開始前失敗 |
+
+16KではANE有効化の差は`+1.24%`で、採用基準の+3%未満だった。ANEコンパイル後も8 MLP層だけがANEへ移り、GDNは0層のままである。32KではGPU-only自体が121.80 tok/sまで落ち、同一長文のANE/GPUは追加の常駐プログラムとKV作業領域を含む経路でMetal OOMとなった。したがって、今回のM1 Max 64GB・q4/group32主体artifactでは「長文になるほどANEが強い」という一般論を採用できない。ANEを本命にするには、oMLXが適格とするgroup64/128主体の別artifact（または量子化再配置）を別ベンチとして用意し、品質・メモリを含めて比較する必要がある。
+
+これは公開されている別artifactの結果を否定するものではない。oMLXの別Qwen3.8 mixed 4/5-bit構成では、M1 Max 64GBで101.1→149.0 prefill tok/s（+47.4%）という報告があるが、量子化、runtime、固定形状が今回と異なるため、今回の144.20 tok/sへ外挿しない。
+
+### 14.3 DeepSeek由来方式の判定
 
 DeepSeek V4/V4.1のcompressed sparse attention（CSA/CSA2）、cross-layer KV reuse、FP4 KV、CED bounded replay、DSparkは、Qwen3.8へ後付けできる一般的なprefillフラグではない。Qwen3.8はqwen3_5のGDN＋通常attentionで、DeepSeekのindexer・compressed attention・encoder/decoder分割・専用draft moduleを持たない。無理にattentionを末尾windowだけにすると出力と品質が変わるため、greedy SHA一致を保つ今回の採用条件に反する。DeepSeekから安全に借りられるのは既に保留しているprefix/session再利用（warm TTFT）であり、cold prefill高速化とは別競技である。
