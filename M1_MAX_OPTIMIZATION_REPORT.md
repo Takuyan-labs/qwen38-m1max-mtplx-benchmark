@@ -19,7 +19,7 @@ Target artifact fingerprint: `sha256:069c2de291fd15b130383119b13f60c45e0f78481a1
 * Rewrite/Edit専用ではstock Context Copyが有効だった。ONは43.871 tok/s中央値、OFFは38.232 tok/s中央値で、約14.8%向上。ONでは10 copy rounds、128 accepted copy tokens、出力correctnessを確認した。これはfresh codeの39.90とは別競技である。
 * stock MTPLX 2.11.3にRAMP実装は見つからなかったため、独自再実装は行わず保留した。
 * `MTPLX_PROJ_REQUANT=q4`（対象は主に上位MLPのq8→q4）ではD3 36.83 tok/s前後だったが、baselineとgreedy出力SHAが変わり、受理率も低下したため不採用。
-* Prefillでは既存のGDN blocked kernelが実際に長文経路へ適用されたが、force-stock対照との差は0.1%未満（再run、各n=2）で、再現性ある改善としては不採用。async-rungsも標準経路より約1%遅く不採用。
+* Prefillでは既存のGDN blocked kernelが実際に長文経路へ適用されたが、n=5比較でも+1.2〜1.3%に留まり、+3%の採用基準未達。async-rungsも標準経路より約1%遅く不採用。
 
 ### 現時点の推奨設定
 
@@ -217,12 +217,12 @@ MTPLX 2.11.3に既存のGated DeltaNet blocked-prefill kernelを、モデル形�
 
 条件は同一revision、AR、`max_tokens=1`、cache bypass、実測prompt 1,590/3,168 tokens。候補は`MTPLX_GDN_BLOCKED_PREFILL=1`、対照は同じ設定に`MTPLX_GDN_BLOCKED_PREFILL_FORCE_STOCK=1`を加えた。いずれも2回ずつで、出力SHAは一致した。
 
-| 実測prompt | blocked median | force-stock median | 差 |
+| 実測prompt | blocked median (n=5) | force-stock median (n=5) | 差 |
 |---:|---:|---:|---:|
-| 1,590 | 154.73 tok/s（debug run） | 154.43 tok/s | +0.19% |
-| 3,168 | 154.56 tok/s（debug run） | 154.47 tok/s | +0.06% |
+| 1,590 | **156.37 tok/s** | 154.30 tok/s | **+1.34%** |
+| 3,168 | **156.44 tok/s** | 154.58 tok/s | **+1.21%** |
 
-別の初回n=2 runでは1,590 tokensが156.30、3,168 tokensが155.80 tok/sになったが、同じ候補の再runでは差がほぼ消えた。したがって現時点では「kernelが適用される」ことは確認できるものの、+3%の再現性ある改善とは言えず、標準設定には採用しない。MTPLXのソース上、この経路はoMLX由来の実験的移植であるため、公開時はMTPLXのLICENSE/NOTICEと原作者表示を維持する。将来続けるなら各5回以上、同一daemonのfresh起動、kernel debug receipt、prompt/output SHAを揃える。
+候補側は1,590/3,168 tokensとも出力SHAが対照と一致した。一方で候補側のCVは1.38/1.53%、対照は0.09/0.09%で、候補のばらつきが大きい。先行n=2では+0.86〜1.21%、debug再runでは+0.06〜0.19%だったため、測定条件による揺れも無視できない。結論は、kernel適用は確認できるが、n=5でも+3%未満であり、標準設定には採用しない。MTPLXのソース上、この経路はoMLX由来の実験的移植であるため、公開時はMTPLXのLICENSE/NOTICEと原作者表示を維持する。
 
 ### 8.6 Warm session cache（別競技）
 
@@ -315,7 +315,7 @@ MTP sidecarはすでにINT4/group64/prequantizedであり、CLIでbitsだけを�
 * Adaptive: [`results/optimization-20260921/adaptive-expected-value-2.11.3-128.json`](results/optimization-20260921/adaptive-expected-value-2.11.3-128.json)
 * Context Copy ON/OFF: [`results/optimization-20260921/context-copy/`](results/optimization-20260921/context-copy/)
 * Mixed quant: [`results/optimization-20260921/mixed-quant-proj-requant-q4-2.11.3-128.json`](results/optimization-20260921/mixed-quant-proj-requant-q4-2.11.3-128.json)
-* Prefill baseline/chunk/rungs/GDN: `results/raw/prefill-baseline-*`, `results/raw/prefill-chunk*`, `results/raw/prefill-rungs8-ar-20260921`, `results/raw/prefill-gdnblocked*-ar-20260921`（raw結果は`.gitignore`対象）
+* Prefill baseline/chunk/rungs/GDN: `results/raw/prefill-baseline-*`, `results/raw/prefill-chunk*`, `results/raw/prefill-rungs8-ar-20260921`, `results/raw/prefill-gdnblocked*-ar-20260921`, `results/raw/prefill-gdn-force-stock-ar-n5-20260921`（raw結果は`.gitignore`対象）
 * Depth sweep harness: [`scripts/benchmark_content_depths.py`](scripts/benchmark_content_depths.py)
 * Context Copy harness: [`scripts/benchmark_context_copy.py`](scripts/benchmark_context_copy.py)
 
