@@ -129,6 +129,12 @@ python3 scripts/benchmark_content_depths.py --runs 5 --tokens 512 --output-dir r
 
 再現時は、他の大規模モデルサーバーを停止してメモリ競合を避けてください。
 
+Prefill/TTFTを1 token生成から分離して測る場合：
+
+    python3 scripts/benchmark_prefill.py --mode ar --runs 5 --max-tokens 1
+
+約1k・2k・4k・8k tokenの固定ASCII promptを使い、実際のprompt_tokensはruntimeの値を保存します。Prompt評価時間、TTFT、request時間、decode時間を分離し、cache bypassとsession再利用なしで測定します。baselineではサーバー起動時にMTPLX_CONTEXT_COPY=0と--ssd-session-cache offを指定してください。harnessはcache hitとContext Copy有効を検出すると停止します。
+
 ### Claude Code CLIから使う
 
 サーバーを起動したまま、別のターミナルでこのリポジトリに移動して実行します。

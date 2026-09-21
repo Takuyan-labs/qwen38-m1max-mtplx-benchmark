@@ -192,6 +192,24 @@ stock MTPLX 2.11.3 packageを検索したが、Context Copy RAMP実装、`ramp.p
 **回答7: RAMPをM1 Maxで使う価値はあるか。**
 今回のstock構成では実装がないため未検証。Context Copyが有効になったRewrite/Editでも、まずstock ONが14.8%改善しているので、外部実装を導入する前に互換性とcorrectnessを確認すべき。独自再実装は今回の範囲外。
 
+## 8.5 Prefill/TTFT基準測定（2026-09-21）
+
+decodeの記録とは分けて、MTPLXが返す`prompt_eval_time_s`、`prompt_tps`、`ttft_s`を測定した。サーバーはMTPLX 2.11.3 / MLX 0.32.2、同一artifact、`MTPLX_CONTEXT_COPY=0`、SSD/session cache off、`max_tokens=1`で起動した。prompt token数はラベルではなくruntimeの実測値を採用した。
+
+標準chunk 2048のAR（3回）の中央値は以下だった。
+
+| 実測prompt tokens | prompt tok/s | TTFT |
+|---:|---:|---:|
+| 802 | 129.75 | 6.183 s |
+| 1,590 | 154.37 | 10.313 s |
+| 3,168 | 154.59 | 20.499 s |
+
+同じ条件のMTP D3（3回）は、802 tokensで127.54 tok/s、1,590で149.24 tok/s、3,168で149.51 tok/sだった。現時点では、MTP D3はdecodeを高速化するが、prefillはARより約3〜4%遅い。
+
+prefill chunkだけを変更した探索では、1024は1,590 tokensで133.44 tok/s、3,168 tokensで142.02 tok/sに低下した。4096は2回の予備測定で1,590 tokensが154.34 tok/s、3,168 tokensが148.03 tok/sだった。したがって、現在のM1 Maxではchunk 2048を維持し、wide-GEMMや最終行vocab projectionなど、計算量そのものを減らす候補へ進む。
+
+この節のchunk変更値は各2〜3回の探索値であり、正式な最高記録ではない。生データは`results/raw/prefill-*`（既定でgit管理外）に保存した。
+
 ## 9. Mixed quantization探索
 
 安全な候補として、artifactの8-bit保持領域のうちMTPLXが対象にする上位MLP projectionを`MTPLX_PROJ_REQUANT=q4`で再量子化した。embedding、lm_head、linear_attn.out_proj、expert bank、MTP sidecarは変更していない。

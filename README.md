@@ -196,6 +196,16 @@ python3 scripts/benchmark_content_depths.py --runs 5 --tokens 512 --output-dir r
 
 This writes JSONL rows with final-output hashes, server timing counters,
 acceptance, verification counts, context-copy counters, and memory fields.
+For a separate prefill/TTFT baseline with one generated token:
+
+    python3 scripts/benchmark_prefill.py --mode ar --runs 5 --max-tokens 1
+
+The prefill harness uses approximate 1k/2k/4k/8k prompt targets, records the
+server-reported prompt token count, and stores prompt evaluation time, TTFT,
+request time, and decode time separately. It keeps cache bypass enabled and
+does not use session reuse. Start the server with MTPLX_CONTEXT_COPY=0 and
+--ssd-session-cache off for this baseline; the harness rejects reported cache
+hits and active Context Copy.
 Unavailable runtime counters remain `null`; the harness never estimates them.
 
 Required command-line tools: Python 3. The server-start and safe-system-info helpers also use standard macOS shell tools and `jq`.
