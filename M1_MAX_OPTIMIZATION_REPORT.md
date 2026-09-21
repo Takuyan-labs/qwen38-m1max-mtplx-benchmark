@@ -19,6 +19,7 @@ Target artifact fingerprint: `sha256:069c2de291fd15b130383119b13f60c45e0f78481a1
 * Rewrite/Edit専用ではstock Context Copyが有効だった。ONは43.871 tok/s中央値、OFFは38.232 tok/s中央値で、約14.8%向上。ONでは10 copy rounds、128 accepted copy tokens、出力correctnessを確認した。これはfresh codeの39.90とは別競技である。
 * stock MTPLX 2.11.3にRAMP実装は見つからなかったため、独自再実装は行わず保留した。
 * `MTPLX_PROJ_REQUANT=q4`（対象は主に上位MLPのq8→q4）ではD3 36.83 tok/s前後だったが、baselineとgreedy出力SHAが変わり、受理率も低下したため不採用。
+* Prefillでは既存のGDN blocked kernelが実際に長文経路へ適用されたが、force-stock対照との差は0.1%未満（再run、各n=2）で、再現性ある改善としては不採用。async-rungsも標準経路より約1%遅く不採用。
 
 ### 現時点の推奨設定
 
@@ -208,7 +209,20 @@ decodeの記録とは分けて、MTPLXが返す`prompt_eval_time_s`、`prompt_tp
 
 prefill chunkだけを変更した探索では、1024は1,590 tokensで133.44 tok/s、3,168 tokensで142.02 tok/sに低下した。4096は2回の予備測定で1,590 tokensが154.34 tok/s、3,168 tokensが148.03 tok/sだった。したがって、現在のM1 Maxではchunk 2048を維持し、wide-GEMMや最終行vocab projectionなど、計算量そのものを減らす候補へ進む。
 
-この節のchunk変更値は各2〜3回の探索値であり、正式な最高記録ではない。生データは`results/raw/prefill-*`（既定でgit管理外）に保存した。
+この節のchunk変更値は各2〜3回の探索値であり、正式な最高記録ではない。なお、現行MTPLXのturbo/sustained経路では最終行だけのvocabulary projection（full-prefill logitsを作らない設定）が既に有効であることをソースとruntime設定から確認したため、同じ最適化を重ねて実装してはいない。新規のQwen3.8/M1向けwide-GEMM経路もローカルの2.11.3には確認できなかった。生データは`results/raw/prefill-*`（既定でgit管理外）に保存した。
+
+### 8.7 GDN blocked prefill（実験的候補）
+
+MTPLX 2.11.3に既存のGated DeltaNet blocked-prefill kernelを、モデル形状が適格なため環境変数だけで有効化してA/Bした。これは今回のrepoで新規実装したkernelではなく、MTPLXに同梱された経路であり、stock強制経路との比較が必要である。
+
+条件は同一revision、AR、`max_tokens=1`、cache bypass、実測prompt 1,590/3,168 tokens。候補は`MTPLX_GDN_BLOCKED_PREFILL=1`、対照は同じ設定に`MTPLX_GDN_BLOCKED_PREFILL_FORCE_STOCK=1`を加えた。いずれも2回ずつで、出力SHAは一致した。
+
+| 実測prompt | blocked median | force-stock median | 差 |
+|---:|---:|---:|---:|
+| 1,590 | 154.73 tok/s（debug run） | 154.43 tok/s | +0.19% |
+| 3,168 | 154.56 tok/s（debug run） | 154.47 tok/s | +0.06% |
+
+別の初回n=2 runでは1,590 tokensが156.30、3,168 tokensが155.80 tok/sになったが、同じ候補の再runでは差がほぼ消えた。したがって現時点では「kernelが適用される」ことは確認できるものの、+3%の再現性ある改善とは言えず、標準設定には採用しない。MTPLXのソース上、この経路はoMLX由来の実験的移植であるため、公開時はMTPLXのLICENSE/NOTICEと原作者表示を維持する。将来続けるなら各5回以上、同一daemonのfresh起動、kernel debug receipt、prompt/output SHAを揃える。
 
 ### 8.6 Warm session cache（別競技）
 
@@ -248,6 +262,8 @@ MTP sidecarはすでにINT4/group64/prequantizedであり、CLIでbitsだけを�
 | 中国語のD3採用 | 保留 | 速度は最速だがSHA不一致 |
 | RAMP | 保留 | stock実装なし。独自実装は範囲外 |
 | q8→q4 projection requant | 不採用 | D3 +0.5%程度、baseline SHA変更、受理率低下 |
+| GDN blocked prefill | 保留/不採用 | kernel適用は確認したが、force-stock対照との差が再runで+0.1%未満（n=2） |
+| Prefill async rungs=8 | 不採用 | 標準chunk2048より約1%遅い予備A/B |
 | MTP head bit変更 | 不実施 | prequantized INT4 sidecarで、単純変更が正当なA/Bにならない |
 | Splash/DFlash/Metal移植 | 不実施 | M1非対応またはkernel全面改造であり、今回の停止条件に該当 |
 
@@ -299,6 +315,7 @@ MTP sidecarはすでにINT4/group64/prequantizedであり、CLIでbitsだけを�
 * Adaptive: [`results/optimization-20260921/adaptive-expected-value-2.11.3-128.json`](results/optimization-20260921/adaptive-expected-value-2.11.3-128.json)
 * Context Copy ON/OFF: [`results/optimization-20260921/context-copy/`](results/optimization-20260921/context-copy/)
 * Mixed quant: [`results/optimization-20260921/mixed-quant-proj-requant-q4-2.11.3-128.json`](results/optimization-20260921/mixed-quant-proj-requant-q4-2.11.3-128.json)
+* Prefill baseline/chunk/rungs/GDN: `results/raw/prefill-baseline-*`, `results/raw/prefill-chunk*`, `results/raw/prefill-rungs8-ar-20260921`, `results/raw/prefill-gdnblocked*-ar-20260921`（raw結果は`.gitignore`対象）
 * Depth sweep harness: [`scripts/benchmark_content_depths.py`](scripts/benchmark_content_depths.py)
 * Context Copy harness: [`scripts/benchmark_context_copy.py`](scripts/benchmark_context_copy.py)
 
