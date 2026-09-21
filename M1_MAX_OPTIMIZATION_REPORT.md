@@ -210,6 +210,17 @@ prefill chunkだけを変更した探索では、1024は1,590 tokensで133.44 to
 
 この節のchunk変更値は各2〜3回の探索値であり、正式な最高記録ではない。生データは`results/raw/prefill-*`（既定でgit管理外）に保存した。
 
+### 8.6 Warm session cache（別競技）
+
+同じ2,161-token promptをcache bypassなしで連続送信した。初回はcold prefill、2回目はRAM session cacheのcloneになった。
+
+| 状態 | cached tokens | new prefill tokens | prompt eval | TTFT | 出力SHA |
+|---|---:|---:|---:|---:|---|
+| cold | 0 | 2,161 | 15.879 s | 16.186 s | `96b071af…` |
+| warm RAM clone | 2,161 | 0 | 0 s | 0.005 s | `96b071af…` |
+
+これは約99.97%のTTFT短縮だが、prefill計算を高速化した値ではなく、同一prefixの再計算を省略した値である。したがってsingle-stream decode記録やcold prefill記録とは混ぜず、agentの継続ターン性能として報告する。
+
 ## 9. Mixed quantization探索
 
 安全な候補として、artifactの8-bit保持領域のうちMTPLXが対象にする上位MLP projectionを`MTPLX_PROJ_REQUANT=q4`で再量子化した。embedding、lm_head、linear_attn.out_proj、expert bank、MTP sidecarは変更していない。
